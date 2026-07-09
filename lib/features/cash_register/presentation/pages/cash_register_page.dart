@@ -1,0 +1,248 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+
+import 'package:meow_meow_store/core/extensions/context_x.dart';
+import 'package:meow_meow_store/core/theme/app_colors.dart';
+import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import '../providers/cash_register_provider.dart';
+
+class CashRegisterPage extends ConsumerWidget {
+  const CashRegisterPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionAsync = ref.watch(cashRegisterProvider);
+    final transactionsAsync = ref.watch(sessionTransactionsProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Caja'),
+      ),
+      body: sessionAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+        data: (session) {
+          if (session == null) {
+            return _ClosedState(
+              onOpen: () => _showOpenDialog(context, ref),
+            );
+          }
+          return _OpenState(
+            session: session,
+            transactionsAsync: transactionsAsync,
+            onClose: () => _showCloseDialog(context, ref),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showOpenDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController(text: '0');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Abrir Caja'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Monto de apertura',
+            prefixText: '\$',
+          ),
+          keyboardType: TextInputType.number,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final amount = double.tryParse(controller.text) ?? 0;
+              await ref.read(cashRegisterProvider.notifier).openSession(amount);
+              if (context.mounted) Navigator.of(context).pop();
+            },
+            child: const Text('Abrir'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCloseDialog(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cerrar Caja'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Monto fisico contado',
+            prefixText: '\$',
+          ),
+          keyboardType: TextInputType.number,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final amount = double.tryParse(controller.text) ?? 0;
+              await ref.read(cashRegisterProvider.notifier).closeSession(amount);
+              if (context.mounted) Navigator.of(context).pop();
+            },
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ClosedState extends StatelessWidget {
+  final VoidCallback onOpen;
+
+  const _ClosedState({required this.onOpen});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.lock_outline,
+            size: 64,
+            color: AppColors.outline,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'Caja Cerrada',
+            style: context.textTheme.headlineMedium,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            'Abre la caja para comenzar a operar',
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: AppColors.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          ElevatedButton.icon(
+            onPressed: onOpen,
+            icon: const Icon(Icons.lock_open),
+            label: const Text('Abrir Caja'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OpenState extends ConsumerWidget {
+  final dynamic session;
+  final AsyncValue<List> transactionsAsync;
+  final VoidCallback onClose;
+
+  const _OpenState({
+    required this.session,
+    required this.transactionsAsync,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
+
+    return Column(
+      children: [
+        Container(
+          padding: AppSpacing.pagePadding,
+          color: AppColors.primaryContainer,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Sesion Abierta',
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: AppColors.onPrimaryContainer,
+                    ),
+                  ),
+                  Text(
+                    'Monto de apertura: ${currencyFormat.format(session.openingAmount)}',
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: AppColors.onPrimaryContainer,
+                    ),
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: onClose,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: AppColors.onError,
+                ),
+                child: const Text('Cerrar Caja'),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: transactionsAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text('Error: $e')),
+            data: (transactions) {
+              if (transactions.isEmpty) {
+                return const Center(
+                  child: Text('No hay transacciones en esta sesion'),
+                );
+              }
+              return ListView.separated(
+                padding: AppSpacing.pagePadding,
+                itemCount: transactions.length,
+                separatorBuilder: (_, _) => const Divider(),
+                itemBuilder: (context, index) {
+                  final tx = transactions[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: tx.isIncome
+                          ? AppColors.primaryContainer
+                          : AppColors.errorContainer,
+                      child: Icon(
+                        tx.isIncome
+                            ? Icons.arrow_downward
+                            : Icons.arrow_upward,
+                        color: tx.isIncome
+                            ? AppColors.onPrimaryContainer
+                            : AppColors.onErrorContainer,
+                        size: 20,
+                      ),
+                    ),
+                    title: Text(tx.description),
+                    subtitle: Text(
+                      DateFormat('dd/MM/yyyy HH:mm').format(tx.createdAt),
+                    ),
+                    trailing: Text(
+                      '${tx.isIncome ? '+' : '-'}${currencyFormat.format(tx.amount)}',
+                      style: context.textTheme.titleMedium?.copyWith(
+                        color: tx.isIncome ? AppColors.primary : AppColors.error,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
