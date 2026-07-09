@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/features/inventory/data/models/product_model.dart';
-import 'package:meow_meow_store/features/inventory/data/repositories/product_repository.dart';
 import '../providers/inventory_provider.dart';
 
 class ProductFormDialog extends ConsumerStatefulWidget {
@@ -29,10 +29,12 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.product?.name ?? '');
-    _barcodeController =
-        TextEditingController(text: widget.product?.barcodeQr ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.product?.description ?? '');
+    _barcodeController = TextEditingController(
+      text: widget.product?.barcodeQr ?? '',
+    );
+    _descriptionController = TextEditingController(
+      text: widget.product?.description ?? '',
+    );
     _buyingPriceController = TextEditingController(
       text: widget.product?.buyingPrice.toString() ?? '',
     );
@@ -99,9 +101,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
               const SizedBox(height: AppSpacing.sm),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Descripcion',
-                ),
+                decoration: const InputDecoration(labelText: 'Descripcion'),
                 maxLines: 2,
               ),
               const SizedBox(height: AppSpacing.sm),
@@ -110,9 +110,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                 error: (e, _) => Text('Error: $e'),
                 data: (categories) => DropdownButtonFormField<String>(
                   initialValue: _selectedCategoryId,
-                  decoration: const InputDecoration(
-                    labelText: 'Categoria',
-                  ),
+                  decoration: const InputDecoration(labelText: 'Categoria'),
                   items: categories
                       .map(
                         (cat) => DropdownMenuItem(
@@ -197,7 +195,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
   Future<void> _saveProduct() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final repo = ProductRepository();
+    final repo = ref.read(productRepositoryProvider);
     final product = Product(
       id: widget.product?.id ?? '',
       name: _nameController.text,

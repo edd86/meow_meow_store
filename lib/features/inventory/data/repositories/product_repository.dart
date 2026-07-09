@@ -1,9 +1,14 @@
-import 'package:meow_meow_store/core/network/supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:meow_meow_store/features/inventory/data/models/product_model.dart';
+import 'abstract_product_repository.dart';
 
-class ProductRepository {
-  final _client = SupabaseClientProvider.instance;
+class ProductRepository implements AbstractProductRepository {
+  final SupabaseClient _client;
 
+  ProductRepository(this._client);
+
+  @override
   Future<List<Product>> getProducts({String? categoryId}) async {
     var query = _client.from('products').select();
 
@@ -18,6 +23,7 @@ class ProductRepository {
         .toList();
   }
 
+  @override
   Future<Product> getProduct(String id) async {
     final response = await _client
         .from('products')
@@ -28,6 +34,7 @@ class ProductRepository {
     return Product.fromJson(response);
   }
 
+  @override
   Future<Product> createProduct(Product product) async {
     final response = await _client
         .from('products')
@@ -38,6 +45,7 @@ class ProductRepository {
     return Product.fromJson(response);
   }
 
+  @override
   Future<Product> updateProduct(Product product) async {
     final response = await _client
         .from('products')
@@ -49,10 +57,12 @@ class ProductRepository {
     return Product.fromJson(response);
   }
 
+  @override
   Future<void> deleteProduct(String id) async {
     await _client.from('products').delete().eq('id', id);
   }
 
+  @override
   Future<List<Product>> searchProducts(String query) async {
     final response = await _client
         .from('products')

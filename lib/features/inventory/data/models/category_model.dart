@@ -21,10 +21,7 @@ class Category {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'description': description,
-    };
+    return {'name': name, 'description': description};
   }
 
   Category copyWith({

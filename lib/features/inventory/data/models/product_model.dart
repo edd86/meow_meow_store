@@ -71,8 +71,9 @@ class Product {
     );
   }
 
-  double get profitMargin =>
-      sellingPrice > 0 ? ((sellingPrice - buyingPrice) / sellingPrice) * 100 : 0;
+  double get profitMargin => sellingPrice > 0
+      ? ((sellingPrice - buyingPrice) / sellingPrice) * 100
+      : 0;
 
   bool get isLowStock => stockQuantity <= 5;
 }

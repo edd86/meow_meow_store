@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/features/inventory/data/models/category_model.dart';
-import 'package:meow_meow_store/features/inventory/data/repositories/category_repository.dart';
 import '../providers/inventory_provider.dart';
 
 class CategoryFormDialog extends ConsumerStatefulWidget {
   const CategoryFormDialog({super.key});
 
   @override
-  ConsumerState<CategoryFormDialog> createState() =>
-      _CategoryFormDialogState();
+  ConsumerState<CategoryFormDialog> createState() => _CategoryFormDialogState();
 }
 
 class _CategoryFormDialogState extends ConsumerState<CategoryFormDialog> {
@@ -84,7 +83,7 @@ class _CategoryFormDialogState extends ConsumerState<CategoryFormDialog> {
   Future<void> _saveCategory() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final repo = CategoryRepository();
+    final repo = ref.read(categoryRepositoryProvider);
     final category = Category(
       id: '',
       name: _nameController.text,
