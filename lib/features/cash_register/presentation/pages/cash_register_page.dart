@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
+import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/cash_register_provider.dart';
 
 class CashRegisterPage extends ConsumerWidget {
@@ -40,26 +42,24 @@ class CashRegisterPage extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Abrir Caja'),
-        content: TextField(
+        content: AppTextField(
+          label: 'Monto de apertura',
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Monto de apertura',
-            prefixText: '\$',
-          ),
           keyboardType: TextInputType.number,
+          prefixText: '\$',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancelar'),
           ),
-          ElevatedButton(
+          AppElevatedButton.primary(
+            label: 'Abrir',
             onPressed: () async {
               final amount = double.tryParse(controller.text) ?? 0;
               await ref.read(cashRegisterProvider.notifier).openSession(amount);
               if (context.mounted) Navigator.of(context).pop();
             },
-            child: const Text('Abrir'),
           ),
         ],
       ),
@@ -72,20 +72,19 @@ class CashRegisterPage extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Cerrar Caja'),
-        content: TextField(
+        content: AppTextField(
+          label: 'Monto fisico contado',
           controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Monto fisico contado',
-            prefixText: '\$',
-          ),
           keyboardType: TextInputType.number,
+          prefixText: '\$',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: const Text('Cancelar'),
           ),
-          ElevatedButton(
+          AppElevatedButton.primary(
+            label: 'Cerrar',
             onPressed: () async {
               final amount = double.tryParse(controller.text) ?? 0;
               await ref
@@ -93,7 +92,6 @@ class CashRegisterPage extends ConsumerWidget {
                   .closeSession(amount);
               if (context.mounted) Navigator.of(context).pop();
             },
-            child: const Text('Cerrar'),
           ),
         ],
       ),
@@ -123,10 +121,10 @@ class _ClosedState extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          ElevatedButton.icon(
+          AppElevatedButton.primary(
+            label: 'Abrir Caja',
             onPressed: onOpen,
-            icon: const Icon(Icons.lock_open),
-            label: const Text('Abrir Caja'),
+            icon: Icons.lock_open,
           ),
         ],
       ),
@@ -174,13 +172,9 @@ class _OpenState extends ConsumerWidget {
                   ),
                 ],
               ),
-              ElevatedButton(
+              AppElevatedButton.danger(
+                label: 'Cerrar Caja',
                 onPressed: onClose,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.error,
-                  foregroundColor: AppColors.onError,
-                ),
-                child: const Text('Cerrar Caja'),
               ),
             ],
           ),
