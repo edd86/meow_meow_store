@@ -1,9 +1,14 @@
-import 'package:meow_meow_store/core/network/supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:meow_meow_store/features/customers/data/models/customer_model.dart';
+import 'abstract_customer_repository.dart';
 
-class CustomerRepository {
-  final _client = SupabaseClientProvider.instance;
+class CustomerRepository implements AbstractCustomerRepository {
+  final SupabaseClient _client;
 
+  CustomerRepository(this._client);
+
+  @override
   Future<List<Customer>> getCustomers({String? search}) async {
     var query = _client.from('customers').select();
 
@@ -20,6 +25,7 @@ class CustomerRepository {
         .toList();
   }
 
+  @override
   Future<Customer> getCustomer(String id) async {
     final response = await _client
         .from('customers')
@@ -30,6 +36,7 @@ class CustomerRepository {
     return Customer.fromJson(response);
   }
 
+  @override
   Future<Customer> createCustomer(Customer customer) async {
     final response = await _client
         .from('customers')
@@ -40,6 +47,7 @@ class CustomerRepository {
     return Customer.fromJson(response);
   }
 
+  @override
   Future<Customer> updateCustomer(Customer customer) async {
     final response = await _client
         .from('customers')
@@ -51,6 +59,7 @@ class CustomerRepository {
     return Customer.fromJson(response);
   }
 
+  @override
   Future<void> deleteCustomer(String id) async {
     await _client.from('customers').delete().eq('id', id);
   }

@@ -91,10 +91,7 @@ class _CustomerList extends StatelessWidget {
   final List customers;
   final dynamic Function(dynamic) onEdit;
 
-  const _CustomerList({
-    required this.customers,
-    required this.onEdit,
-  });
+  const _CustomerList({required this.customers, required this.onEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -117,15 +114,9 @@ class _CustomerList extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (customer.email != null)
-                Text(
-                  customer.email!,
-                  style: context.textTheme.bodySmall,
-                ),
+                Text(customer.email!, style: context.textTheme.bodySmall),
               if (customer.phone != null)
-                Text(
-                  customer.phone!,
-                  style: context.textTheme.bodySmall,
-                ),
+                Text(customer.phone!, style: context.textTheme.bodySmall),
             ],
           ),
           trailing: IconButton(
