@@ -1,25 +1,19 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:meow_meow_store/features/inventory/data/models/product_model.dart';
-import 'package:meow_meow_store/features/inventory/data/repositories/product_repository.dart';
-import 'package:meow_meow_store/features/sales/data/repositories/sale_repository.dart';
-import 'package:meow_meow_store/features/sales/data/models/sale_model.dart';
+import '../../../../core/providers/repository_providers.dart';
+import '../../../inventory/data/models/product_model.dart';
+import '../../../sales/data/models/sale_model.dart';
+import '../../../sales/data/repositories/abstract_sale_repository.dart';
 
 class CartItem {
   final Product product;
   final int quantity;
 
-  const CartItem({
-    required this.product,
-    required this.quantity,
-  });
+  const CartItem({required this.product, required this.quantity});
 
   double get totalPrice => product.sellingPrice * quantity;
 
-  CartItem copyWith({
-    Product? product,
-    int? quantity,
-  }) {
+  CartItem copyWith({Product? product, int? quantity}) {
     return CartItem(
       product: product ?? this.product,
       quantity: quantity ?? this.quantity,
@@ -32,10 +26,8 @@ class POSState {
 
   const POSState({this.items = const []});
 
-  double get totalAmount => items.fold<double>(
-        0,
-        (sum, item) => sum + item.totalPrice,
-      );
+  double get totalAmount =>
+      items.fold<double>(0, (sum, item) => sum + item.totalPrice);
 
   POSState copyWith({List<CartItem>? items}) {
     return POSState(items: items ?? this.items);
@@ -43,7 +35,9 @@ class POSState {
 }
 
 class POSNotifier extends StateNotifier<POSState> {
-  POSNotifier() : super(const POSState());
+  final AbstractSaleRepository _saleRepo;
+
+  POSNotifier(this._saleRepo) : super(const POSState());
 
   void addItem(Product product) {
     final existingIndex = state.items.indexWhere(
@@ -58,7 +52,10 @@ class POSNotifier extends StateNotifier<POSState> {
       state = state.copyWith(items: updatedItems);
     } else {
       state = state.copyWith(
-        items: [...state.items, CartItem(product: product, quantity: 1)],
+        items: [
+          ...state.items,
+          CartItem(product: product, quantity: 1),
+        ],
       );
     }
   }
@@ -90,7 +87,6 @@ class POSNotifier extends StateNotifier<POSState> {
   }
 
   Future<void> completeSale() async {
-    final saleRepo = SaleRepository();
     final items = state.items
         .map(
           (item) => SaleItem(
@@ -104,21 +100,22 @@ class POSNotifier extends StateNotifier<POSState> {
         )
         .toList();
 
-    final sale = await saleRepo.createSale(items: items);
-    await saleRepo.completeSale(sale.id);
+    final sale = await _saleRepo.createSale(items: items);
+    await _saleRepo.completeSale(sale.id);
     clear();
   }
 }
 
 final posProvider = StateNotifierProvider<POSNotifier, POSState>((ref) {
-  return POSNotifier();
+  final saleRepo = ref.watch(saleRepositoryProvider);
+  return POSNotifier(saleRepo);
 });
 
 final posSearchProvider = StateProvider<String>((ref) => '');
 
 final posProductsProvider = FutureProvider<List<Product>>((ref) async {
   final search = ref.watch(posSearchProvider);
-  final repo = ProductRepository();
+  final repo = ref.watch(productRepositoryProvider);
 
   if (search.isEmpty) {
     return repo.getProducts();

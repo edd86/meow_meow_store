@@ -65,9 +65,8 @@ class _POSPageState extends ConsumerState<POSPage> {
                 ),
                 Expanded(
                   child: productsAsync.when(
-                    loading: () => const Center(
-                      child: CircularProgressIndicator(),
-                    ),
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
                     error: (e, _) => Center(child: Text('Error: $e')),
                     data: (products) {
                       if (products.isEmpty) {
@@ -106,10 +105,7 @@ class _POSPageState extends ConsumerState<POSPage> {
 
   void _showCheckoutDialog(BuildContext context, WidgetRef ref) {
     final posState = ref.read(posProvider);
-    final currencyFormat = NumberFormat.currency(
-      locale: 'es_MX',
-      symbol: '\$',
-    );
+    final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
 
     showModalBottomSheet(
       context: context,

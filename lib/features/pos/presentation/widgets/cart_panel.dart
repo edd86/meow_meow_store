@@ -20,9 +20,7 @@ class CartPanel extends ConsumerWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        border: Border(
-          left: BorderSide(color: AppColors.surfaceVariant),
-        ),
+        border: Border(left: BorderSide(color: AppColors.surfaceVariant)),
       ),
       child: Column(
         children: [
@@ -37,10 +35,7 @@ class CartPanel extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Carrito',
-                  style: context.textTheme.headlineSmall,
-                ),
+                Text('Carrito', style: context.textTheme.headlineSmall),
                 if (posState.items.isNotEmpty)
                   TextButton.icon(
                     onPressed: () {
@@ -81,15 +76,14 @@ class CartPanel extends ConsumerWidget {
                         item: item,
                         currencyFormat: currencyFormat,
                         onQuantityChanged: (quantity) {
-                          ref.read(posProvider.notifier).updateQuantity(
-                                item.product.id,
-                                quantity,
-                              );
+                          ref
+                              .read(posProvider.notifier)
+                              .updateQuantity(item.product.id, quantity);
                         },
                         onRemove: () {
-                          ref.read(posProvider.notifier).removeItem(
-                                item.product.id,
-                              );
+                          ref
+                              .read(posProvider.notifier)
+                              .removeItem(item.product.id);
                         },
                       );
                     },
@@ -99,19 +93,14 @@ class CartPanel extends ConsumerWidget {
             padding: AppSpacing.pagePadding,
             decoration: const BoxDecoration(
               color: AppColors.surfaceContainerLow,
-              border: Border(
-                top: BorderSide(color: AppColors.surfaceVariant),
-              ),
+              border: Border(top: BorderSide(color: AppColors.surfaceVariant)),
             ),
             child: Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'Total',
-                      style: context.textTheme.titleLarge,
-                    ),
+                    Text('Total', style: context.textTheme.titleLarge),
                     Text(
                       currencyFormat.format(posState.totalAmount),
                       style: context.textTheme.headlineSmall?.copyWith(
@@ -180,10 +169,7 @@ class _CartItemTile extends StatelessWidget {
               icon: const Icon(Icons.remove_circle_outline, size: 20),
               onPressed: () => onQuantityChanged(item.quantity - 1),
             ),
-            Text(
-              '${item.quantity}',
-              style: context.textTheme.titleMedium,
-            ),
+            Text('${item.quantity}', style: context.textTheme.titleMedium),
             IconButton(
               icon: const Icon(Icons.add_circle_outline, size: 20),
               onPressed: () => onQuantityChanged(item.quantity + 1),
