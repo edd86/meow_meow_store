@@ -114,6 +114,11 @@ abstract final class AppTheme {
         thickness: 1,
         space: 1,
       ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.primary,
+        ),
+      ),
     );
   }
 
