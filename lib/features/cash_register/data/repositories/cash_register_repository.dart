@@ -1,11 +1,16 @@
-import 'package:meow_meow_store/core/network/supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:meow_meow_store/features/cash_register/data/models/cash_register_model.dart';
 import 'package:meow_meow_store/features/cash_register/data/models/cash_register_session_model.dart';
 import 'package:meow_meow_store/features/cash_register/data/models/cash_transaction_model.dart';
+import 'abstract_cash_register_repository.dart';
 
-class CashRegisterRepository {
-  final _client = SupabaseClientProvider.instance;
+class CashRegisterRepository implements AbstractCashRegisterRepository {
+  final SupabaseClient _client;
 
+  CashRegisterRepository(this._client);
+
+  @override
   Future<CashRegister?> getDefaultCashRegister() async {
     final response = await _client
         .from('cash_registers')
@@ -17,6 +22,7 @@ class CashRegisterRepository {
     return CashRegister.fromJson(response);
   }
 
+  @override
   Future<CashRegisterSession?> getOpenSession() async {
     final response = await _client
         .from('cash_register_sessions')
@@ -29,6 +35,7 @@ class CashRegisterRepository {
     return CashRegisterSession.fromJson(response);
   }
 
+  @override
   Future<CashRegisterSession> openSession({
     required String cashRegisterId,
     required double openingAmount,
@@ -48,6 +55,7 @@ class CashRegisterRepository {
     return CashRegisterSession.fromJson(response);
   }
 
+  @override
   Future<CashRegisterSession> closeSession({
     required String sessionId,
     required double closingAmount,
@@ -68,6 +76,7 @@ class CashRegisterRepository {
     return CashRegisterSession.fromJson(response);
   }
 
+  @override
   Future<List<CashTransaction>> getTransactions({
     String? sessionId,
     String? type,
@@ -88,6 +97,7 @@ class CashRegisterRepository {
         .toList();
   }
 
+  @override
   Future<CashTransaction> createTransaction({
     required String sessionId,
     required String type,

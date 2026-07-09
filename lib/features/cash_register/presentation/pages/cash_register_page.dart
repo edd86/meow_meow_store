@@ -16,17 +16,13 @@ class CashRegisterPage extends ConsumerWidget {
     final transactionsAsync = ref.watch(sessionTransactionsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Caja'),
-      ),
+      appBar: AppBar(title: const Text('Caja')),
       body: sessionAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (session) {
           if (session == null) {
-            return _ClosedState(
-              onOpen: () => _showOpenDialog(context, ref),
-            );
+            return _ClosedState(onOpen: () => _showOpenDialog(context, ref));
           }
           return _OpenState(
             session: session,
@@ -92,7 +88,9 @@ class CashRegisterPage extends ConsumerWidget {
           ElevatedButton(
             onPressed: () async {
               final amount = double.tryParse(controller.text) ?? 0;
-              await ref.read(cashRegisterProvider.notifier).closeSession(amount);
+              await ref
+                  .read(cashRegisterProvider.notifier)
+                  .closeSession(amount);
               if (context.mounted) Navigator.of(context).pop();
             },
             child: const Text('Cerrar'),
@@ -114,16 +112,9 @@ class _ClosedState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.lock_outline,
-            size: 64,
-            color: AppColors.outline,
-          ),
+          const Icon(Icons.lock_outline, size: 64, color: AppColors.outline),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            'Caja Cerrada',
-            style: context.textTheme.headlineMedium,
-          ),
+          Text('Caja Cerrada', style: context.textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'Abre la caja para comenzar a operar',
@@ -216,9 +207,7 @@ class _OpenState extends ConsumerWidget {
                           ? AppColors.primaryContainer
                           : AppColors.errorContainer,
                       child: Icon(
-                        tx.isIncome
-                            ? Icons.arrow_downward
-                            : Icons.arrow_upward,
+                        tx.isIncome ? Icons.arrow_downward : Icons.arrow_upward,
                         color: tx.isIncome
                             ? AppColors.onPrimaryContainer
                             : AppColors.onErrorContainer,
@@ -232,7 +221,9 @@ class _OpenState extends ConsumerWidget {
                     trailing: Text(
                       '${tx.isIncome ? '+' : '-'}${currencyFormat.format(tx.amount)}',
                       style: context.textTheme.titleMedium?.copyWith(
-                        color: tx.isIncome ? AppColors.primary : AppColors.error,
+                        color: tx.isIncome
+                            ? AppColors.primary
+                            : AppColors.error,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

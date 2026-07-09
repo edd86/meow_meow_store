@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:meow_meow_store/features/cash_register/data/models/cash_register_session_model.dart';
-import 'package:meow_meow_store/features/cash_register/data/models/cash_transaction_model.dart';
-import 'package:meow_meow_store/features/cash_register/data/repositories/cash_register_repository.dart';
+import '../../../../core/providers/repository_providers.dart';
+import '../../data/models/cash_register_session_model.dart';
+import '../../data/models/cash_transaction_model.dart';
+import '../../data/repositories/abstract_cash_register_repository.dart';
 
-class CashRegisterNotifier extends StateNotifier<AsyncValue<CashRegisterSession?>> {
-  final CashRegisterRepository _repo;
+class CashRegisterNotifier
+    extends StateNotifier<AsyncValue<CashRegisterSession?>> {
+  final AbstractCashRegisterRepository _repo;
 
   CashRegisterNotifier(this._repo) : super(const AsyncValue.loading()) {
     _loadSession();
@@ -55,16 +57,20 @@ class CashRegisterNotifier extends StateNotifier<AsyncValue<CashRegisterSession?
 }
 
 final cashRegisterProvider =
-    StateNotifierProvider<CashRegisterNotifier, AsyncValue<CashRegisterSession?>>(
-  (ref) {
-    return CashRegisterNotifier(CashRegisterRepository());
-  },
-);
+    StateNotifierProvider<
+      CashRegisterNotifier,
+      AsyncValue<CashRegisterSession?>
+    >((ref) {
+      final repo = ref.watch(cashRegisterRepositoryProvider);
+      return CashRegisterNotifier(repo);
+    });
 
-final sessionTransactionsProvider = FutureProvider<List<CashTransaction>>((ref) async {
+final sessionTransactionsProvider = FutureProvider<List<CashTransaction>>((
+  ref,
+) async {
   final session = ref.watch(cashRegisterProvider);
   if (session.value == null) return [];
 
-  final repo = CashRegisterRepository();
+  final repo = ref.watch(cashRegisterRepositoryProvider);
   return repo.getTransactions(sessionId: session.value!.id);
 });
