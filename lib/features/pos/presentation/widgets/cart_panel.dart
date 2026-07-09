@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
 import '../providers/pos_provider.dart';
 
 class CartPanel extends ConsumerWidget {
@@ -111,12 +112,10 @@ class CartPanel extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: posState.items.isEmpty ? null : onCheckout,
-                    child: const Text('Cobrar'),
-                  ),
+                AppElevatedButton.primary(
+                  label: 'Cobrar',
+                  onPressed: posState.items.isEmpty ? null : onCheckout,
+                  fullWidth: true,
                 ),
               ],
             ),

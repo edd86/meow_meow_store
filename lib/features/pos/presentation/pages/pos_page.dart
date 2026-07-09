@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
+import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/pos_provider.dart';
 import '../widgets/product_grid.dart';
 import '../widgets/cart_panel.dart';
@@ -52,12 +54,9 @@ class _POSPageState extends ConsumerState<POSPage> {
               children: [
                 Padding(
                   padding: AppSpacing.pagePadding,
-                  child: TextField(
+                  child: AppTextField(
+                    label: 'Buscar productos...',
                     controller: _searchController,
-                    decoration: const InputDecoration(
-                      hintText: 'Buscar productos...',
-                      prefixIcon: Icon(Icons.search),
-                    ),
                     onChanged: (value) {
                       ref.read(posSearchProvider.notifier).state = value;
                     },
@@ -165,23 +164,21 @@ class _POSPageState extends ConsumerState<POSPage> {
                   ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      await ref.read(posProvider.notifier).completeSale();
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Venta completada exitosamente'),
-                            backgroundColor: AppColors.primary,
-                          ),
-                        );
-                      }
-                    },
-                    child: const Text('Completar Venta'),
-                  ),
+                AppElevatedButton.primary(
+                  label: 'Completar Venta',
+                  onPressed: () async {
+                    await ref.read(posProvider.notifier).completeSale();
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Venta completada exitosamente'),
+                          backgroundColor: AppColors.primary,
+                        ),
+                      );
+                    }
+                  },
+                  fullWidth: true,
                 ),
               ],
             ),
