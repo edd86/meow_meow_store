@@ -44,27 +44,42 @@ class ShellScaffold extends StatelessWidget {
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard, color: AppColors.onPrimaryContainer),
+            selectedIcon: Icon(
+              Icons.dashboard,
+              color: AppColors.onPrimaryContainer,
+            ),
             label: 'Inicio',
           ),
           NavigationDestination(
             icon: Icon(Icons.point_of_sale_outlined),
-            selectedIcon: Icon(Icons.point_of_sale, color: AppColors.onPrimaryContainer),
+            selectedIcon: Icon(
+              Icons.point_of_sale,
+              color: AppColors.onPrimaryContainer,
+            ),
             label: 'POS',
           ),
           NavigationDestination(
             icon: Icon(Icons.inventory_2_outlined),
-            selectedIcon: Icon(Icons.inventory_2, color: AppColors.onPrimaryContainer),
+            selectedIcon: Icon(
+              Icons.inventory_2,
+              color: AppColors.onPrimaryContainer,
+            ),
             label: 'Inventario',
           ),
           NavigationDestination(
             icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people, color: AppColors.onPrimaryContainer),
+            selectedIcon: Icon(
+              Icons.people,
+              color: AppColors.onPrimaryContainer,
+            ),
             label: 'Clientes',
           ),
           NavigationDestination(
             icon: Icon(Icons.payments_outlined),
-            selectedIcon: Icon(Icons.payments, color: AppColors.onPrimaryContainer),
+            selectedIcon: Icon(
+              Icons.payments,
+              color: AppColors.onPrimaryContainer,
+            ),
             label: 'Caja',
           ),
         ],

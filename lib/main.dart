@@ -13,9 +13,5 @@ void main() async {
     publishableKey: Env.supabaseAnonKey,
   );
 
-  runApp(
-    const ProviderScope(
-      child: MeowMeowApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MeowMeowApp()));
 }
