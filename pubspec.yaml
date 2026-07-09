@@ -1,6 +1,6 @@
 name: meow_meow_store
 description: "Meow Meow Store - CRM & POS System"
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -17,6 +17,7 @@ dependencies:
   intl: ^0.20.2
   envied: ^1.0.0
   google_fonts: ^6.2.1
+  mobile_scanner: ^7.2.0
 
 dev_dependencies:
   flutter_test:
