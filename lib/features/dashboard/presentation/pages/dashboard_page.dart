@@ -15,9 +15,7 @@ class DashboardPage extends ConsumerWidget {
     final statsAsync = ref.watch(dashboardStatsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Meow Meow Store'),
-      ),
+      appBar: AppBar(title: const Text('Meow Meow Store')),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
@@ -26,17 +24,11 @@ class DashboardPage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Resumen del Dia',
-                style: context.textTheme.headlineSmall,
-              ),
+              Text('Resumen del Dia', style: context.textTheme.headlineSmall),
               const SizedBox(height: AppSpacing.md),
               _StatsGrid(stats: stats),
               const SizedBox(height: AppSpacing.lg),
-              Text(
-                'Acciones Rapidas',
-                style: context.textTheme.headlineSmall,
-              ),
+              Text('Acciones Rapidas', style: context.textTheme.headlineSmall),
               const SizedBox(height: AppSpacing.md),
               _QuickActions(),
             ],
@@ -195,15 +187,9 @@ class _ActionCard extends StatelessWidget {
               Icon(icon, color: AppColors.primary),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(
-                  title,
-                  style: context.textTheme.titleMedium,
-                ),
+                child: Text(title, style: context.textTheme.titleMedium),
               ),
-              const Icon(
-                Icons.chevron_right,
-                color: AppColors.outline,
-              ),
+              const Icon(Icons.chevron_right, color: AppColors.outline),
             ],
           ),
         ),

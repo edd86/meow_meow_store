@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:meow_meow_store/features/sales/data/repositories/sale_repository.dart';
-import 'package:meow_meow_store/features/inventory/data/repositories/product_repository.dart';
-import 'package:meow_meow_store/features/customers/data/repositories/customer_repository.dart';
+import '../../../../core/providers/repository_providers.dart';
 
 class DashboardStats {
   final double todaySales;
@@ -19,9 +17,9 @@ class DashboardStats {
 }
 
 final dashboardStatsProvider = FutureProvider<DashboardStats>((ref) async {
-  final saleRepo = SaleRepository();
-  final productRepo = ProductRepository();
-  final customerRepo = CustomerRepository();
+  final saleRepo = ref.watch(saleRepositoryProvider);
+  final productRepo = ref.watch(productRepositoryProvider);
+  final customerRepo = ref.watch(customerRepositoryProvider);
 
   final results = await Future.wait([
     saleRepo.getSales(),
