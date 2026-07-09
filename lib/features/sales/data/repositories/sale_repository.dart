@@ -1,9 +1,14 @@
-import 'package:meow_meow_store/core/network/supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:meow_meow_store/features/sales/data/models/sale_model.dart';
+import 'abstract_sale_repository.dart';
 
-class SaleRepository {
-  final _client = SupabaseClientProvider.instance;
+class SaleRepository implements AbstractSaleRepository {
+  final SupabaseClient _client;
 
+  SaleRepository(this._client);
+
+  @override
   Future<List<Sale>> getSales({String? status}) async {
     var query = _client.from('sales').select();
 
@@ -18,6 +23,7 @@ class SaleRepository {
         .toList();
   }
 
+  @override
   Future<Sale> getSale(String id) async {
     final response = await _client
         .from('sales')
@@ -28,6 +34,7 @@ class SaleRepository {
     return Sale.fromJson(response);
   }
 
+  @override
   Future<Sale> createSale({
     String? customerId,
     String? userId,
@@ -65,6 +72,7 @@ class SaleRepository {
     return sale;
   }
 
+  @override
   Future<Sale> completeSale(String saleId) async {
     final response = await _client
         .from('sales')
@@ -76,6 +84,7 @@ class SaleRepository {
     return Sale.fromJson(response);
   }
 
+  @override
   Future<Sale> cancelSale(String saleId) async {
     final response = await _client
         .from('sales')
@@ -87,6 +96,7 @@ class SaleRepository {
     return Sale.fromJson(response);
   }
 
+  @override
   Future<List<SaleItem>> getSaleItems(String saleId) async {
     final response = await _client
         .from('sale_items')
