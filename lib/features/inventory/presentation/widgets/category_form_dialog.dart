@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/providers/repository_providers.dart';
+import 'package:meow_meow_store/core/widgets/app_form_dialog_scaffold.dart';
+import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import 'package:meow_meow_store/features/inventory/data/models/category_model.dart';
 import '../providers/inventory_provider.dart';
 
@@ -10,7 +11,8 @@ class CategoryFormDialog extends ConsumerStatefulWidget {
   const CategoryFormDialog({super.key});
 
   @override
-  ConsumerState<CategoryFormDialog> createState() => _CategoryFormDialogState();
+  ConsumerState<CategoryFormDialog> createState() =>
+      _CategoryFormDialogState();
 }
 
 class _CategoryFormDialogState extends ConsumerState<CategoryFormDialog> {
@@ -27,56 +29,26 @@ class _CategoryFormDialogState extends ConsumerState<CategoryFormDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        padding: AppSpacing.pagePadding,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Nueva Categoria',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de la categoria',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'El nombre es requerido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Descripcion (opcional)',
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveCategory,
-                  child: const Text('Guardar'),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-            ],
-          ),
+    return AppFormDialogScaffold(
+      title: 'Nueva Categoria',
+      formKey: _formKey,
+      onSave: _saveCategory,
+      children: [
+        AppTextField(
+          label: 'Nombre de la categoria',
+          controller: _nameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'El nombre es requerido';
+            return null;
+          },
         ),
-      ),
+        const SizedBox(height: 8),
+        AppTextField(
+          label: 'Descripcion (opcional)',
+          controller: _descriptionController,
+          maxLines: 2,
+        ),
+      ],
     );
   }
 
