@@ -1,9 +1,14 @@
-import 'package:meow_meow_store/core/network/supabase_client.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import 'package:meow_meow_store/features/purchases/data/models/purchase_model.dart';
+import 'abstract_purchase_repository.dart';
 
-class PurchaseRepository {
-  final _client = SupabaseClientProvider.instance;
+class PurchaseRepository implements AbstractPurchaseRepository {
+  final SupabaseClient _client;
 
+  PurchaseRepository(this._client);
+
+  @override
   Future<List<Purchase>> getPurchases({String? status}) async {
     var query = _client.from('purchases').select();
 
@@ -18,6 +23,7 @@ class PurchaseRepository {
         .toList();
   }
 
+  @override
   Future<Purchase> getPurchase(String id) async {
     final response = await _client
         .from('purchases')
@@ -28,6 +34,7 @@ class PurchaseRepository {
     return Purchase.fromJson(response);
   }
 
+  @override
   Future<Purchase> createPurchase({
     String? supplierName,
     required List<PurchaseItem> items,
@@ -63,6 +70,7 @@ class PurchaseRepository {
     return purchase;
   }
 
+  @override
   Future<Purchase> completePurchase(String purchaseId) async {
     final response = await _client
         .from('purchases')
@@ -74,6 +82,7 @@ class PurchaseRepository {
     return Purchase.fromJson(response);
   }
 
+  @override
   Future<Purchase> cancelPurchase(String purchaseId) async {
     final response = await _client
         .from('purchases')
