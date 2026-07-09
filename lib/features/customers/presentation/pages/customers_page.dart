@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/customers_provider.dart';
 import '../widgets/customer_form_dialog.dart';
 
@@ -41,12 +42,9 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
         children: [
           Padding(
             padding: AppSpacing.pagePadding,
-            child: TextField(
+            child: AppTextField(
+              label: 'Buscar clientes...',
               controller: _searchController,
-              decoration: const InputDecoration(
-                hintText: 'Buscar clientes...',
-                prefixIcon: Icon(Icons.search),
-              ),
               onChanged: (value) {
                 ref.read(customerSearchProvider.notifier).state = value;
               },

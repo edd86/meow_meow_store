@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/providers/repository_providers.dart';
+import 'package:meow_meow_store/core/widgets/app_form_dialog_scaffold.dart';
+import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import 'package:meow_meow_store/features/customers/data/models/customer_model.dart';
 import '../providers/customers_provider.dart';
 
@@ -12,7 +13,8 @@ class CustomerFormDialog extends ConsumerStatefulWidget {
   const CustomerFormDialog({super.key, this.customer});
 
   @override
-  ConsumerState<CustomerFormDialog> createState() => _CustomerFormDialogState();
+  ConsumerState<CustomerFormDialog> createState() =>
+      _CustomerFormDialogState();
 }
 
 class _CustomerFormDialogState extends ConsumerState<CustomerFormDialog> {
@@ -25,18 +27,14 @@ class _CustomerFormDialogState extends ConsumerState<CustomerFormDialog> {
   @override
   void initState() {
     super.initState();
-    _firstNameController = TextEditingController(
-      text: widget.customer?.firstName ?? '',
-    );
-    _lastNameController = TextEditingController(
-      text: widget.customer?.lastName ?? '',
-    );
-    _emailController = TextEditingController(
-      text: widget.customer?.email ?? '',
-    );
-    _phoneController = TextEditingController(
-      text: widget.customer?.phone ?? '',
-    );
+    _firstNameController =
+        TextEditingController(text: widget.customer?.firstName ?? '');
+    _lastNameController =
+        TextEditingController(text: widget.customer?.lastName ?? '');
+    _emailController =
+        TextEditingController(text: widget.customer?.email ?? '');
+    _phoneController =
+        TextEditingController(text: widget.customer?.phone ?? '');
   }
 
   @override
@@ -50,63 +48,38 @@ class _CustomerFormDialogState extends ConsumerState<CustomerFormDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      child: SingleChildScrollView(
-        padding: AppSpacing.pagePadding,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.customer == null ? 'Nuevo Cliente' : 'Editar Cliente',
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              TextFormField(
-                controller: _firstNameController,
-                decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'El nombre es requerido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _lastNameController,
-                decoration: const InputDecoration(labelText: 'Apellido'),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(labelText: 'Telefono'),
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _saveCustomer,
-                  child: const Text('Guardar'),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.md),
-            ],
-          ),
+    return AppFormDialogScaffold(
+      title:
+          widget.customer == null ? 'Nuevo Cliente' : 'Editar Cliente',
+      formKey: _formKey,
+      onSave: _saveCustomer,
+      children: [
+        AppTextField(
+          label: 'Nombre',
+          controller: _firstNameController,
+          validator: (value) {
+            if (value == null || value.isEmpty) return 'El nombre es requerido';
+            return null;
+          },
         ),
-      ),
+        const SizedBox(height: 8),
+        AppTextField(
+          label: 'Apellido',
+          controller: _lastNameController,
+        ),
+        const SizedBox(height: 8),
+        AppTextField(
+          label: 'Email',
+          controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 8),
+        AppTextField(
+          label: 'Telefono',
+          controller: _phoneController,
+          keyboardType: TextInputType.phone,
+        ),
+      ],
     );
   }
 
@@ -117,9 +90,8 @@ class _CustomerFormDialogState extends ConsumerState<CustomerFormDialog> {
     final customer = Customer(
       id: widget.customer?.id ?? '',
       firstName: _firstNameController.text,
-      lastName: _lastNameController.text.isNotEmpty
-          ? _lastNameController.text
-          : null,
+      lastName:
+          _lastNameController.text.isNotEmpty ? _lastNameController.text : null,
       email: _emailController.text.isNotEmpty ? _emailController.text : null,
       phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
       createdAt: widget.customer?.createdAt ?? DateTime.now(),
