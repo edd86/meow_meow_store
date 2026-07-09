@@ -14,9 +14,7 @@ abstract final class AppSpacing {
   static const EdgeInsets horizontalPadding = EdgeInsets.symmetric(
     horizontal: md,
   );
-  static const EdgeInsets verticalPadding = EdgeInsets.symmetric(
-    vertical: md,
-  );
+  static const EdgeInsets verticalPadding = EdgeInsets.symmetric(vertical: md);
 }
 
 abstract final class AppRadius {
@@ -32,12 +30,10 @@ abstract final class AppRadius {
   static BorderRadius get xlAll => BorderRadius.circular(xl);
   static BorderRadius get fullAll => BorderRadius.circular(full);
 
-  static BorderRadius get topLg => const BorderRadius.vertical(
-        top: Radius.circular(lg),
-      );
-  static BorderRadius get topXl => const BorderRadius.vertical(
-        top: Radius.circular(xl),
-      );
+  static BorderRadius get topLg =>
+      const BorderRadius.vertical(top: Radius.circular(lg));
+  static BorderRadius get topXl =>
+      const BorderRadius.vertical(top: Radius.circular(xl));
 }
 
 abstract final class AppElevation {

@@ -58,9 +58,7 @@ abstract final class AppTheme {
       cardTheme: CardThemeData(
         color: AppColors.surfaceContainerLowest,
         elevation: 1,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -88,9 +86,7 @@ abstract final class AppTheme {
           foregroundColor: AppColors.onPrimary,
           shape: const StadiumBorder(),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle: textTheme.labelLarge?.copyWith(
-            color: AppColors.onPrimary,
-          ),
+          textStyle: textTheme.labelLarge?.copyWith(color: AppColors.onPrimary),
         ),
       ),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(

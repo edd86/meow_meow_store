@@ -19,33 +19,28 @@ final routerProvider = Provider<GoRouter>((ref) {
         routes: [
           GoRoute(
             path: '/',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: DashboardPage(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: DashboardPage()),
           ),
           GoRoute(
             path: '/pos',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: POSPage(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: POSPage()),
           ),
           GoRoute(
             path: '/inventory',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: InventoryPage(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: InventoryPage()),
           ),
           GoRoute(
             path: '/customers',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: CustomersPage(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: CustomersPage()),
           ),
           GoRoute(
             path: '/cash-register',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: CashRegisterPage(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: CashRegisterPage()),
           ),
         ],
       ),
