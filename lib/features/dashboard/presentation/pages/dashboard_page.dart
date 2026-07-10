@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import '../providers/dashboard_provider.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -18,7 +20,7 @@ class DashboardPage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Meow Meow Store')),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar el dashboard.'),
         data: (stats) => SingleChildScrollView(
           padding: AppSpacing.pagePadding,
           child: Column(
@@ -51,7 +53,7 @@ class _StatsGrid extends StatelessWidget {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: context.isMobile ? 2 : 4,
+      crossAxisCount: 2,
       crossAxisSpacing: AppSpacing.gutter,
       mainAxisSpacing: AppSpacing.gutter,
       childAspectRatio: 1.5,
@@ -138,7 +140,7 @@ class _QuickActions extends StatelessWidget {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: context.isMobile ? 2 : 3,
+      crossAxisCount: 2,
       crossAxisSpacing: AppSpacing.gutter,
       mainAxisSpacing: AppSpacing.gutter,
       childAspectRatio: 2.5,
