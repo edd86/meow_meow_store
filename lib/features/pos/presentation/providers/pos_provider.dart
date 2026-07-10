@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/exceptions/app_exception.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../../inventory/data/models/product_model.dart';
 import '../../../sales/data/models/sale_model.dart';
@@ -87,22 +88,26 @@ class POSNotifier extends StateNotifier<POSState> {
   }
 
   Future<void> completeSale() async {
-    final items = state.items
-        .map(
-          (item) => SaleItem(
-            id: '',
-            saleId: '',
-            productId: item.product.id,
-            quantity: item.quantity,
-            unitPrice: item.product.sellingPrice,
-            totalPrice: item.totalPrice,
-          ),
-        )
-        .toList();
+    try {
+      final items = state.items
+          .map(
+            (item) => SaleItem(
+              id: '',
+              saleId: '',
+              productId: item.product.id,
+              quantity: item.quantity,
+              unitPrice: item.product.sellingPrice,
+              totalPrice: item.totalPrice,
+            ),
+          )
+          .toList();
 
-    final sale = await _saleRepo.createSale(items: items);
-    await _saleRepo.completeSale(sale.id);
-    clear();
+      final sale = await _saleRepo.createSale(items: items);
+      await _saleRepo.completeSale(sale.id);
+      clear();
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 }
 
@@ -117,8 +122,12 @@ final posProductsProvider = FutureProvider<List<Product>>((ref) async {
   final search = ref.watch(posSearchProvider);
   final repo = ref.watch(productRepositoryProvider);
 
-  if (search.isEmpty) {
-    return repo.getProducts();
+  try {
+    if (search.isEmpty) {
+      return repo.getProducts();
+    }
+    return repo.searchProducts(search);
+  } catch (e) {
+    throw ServerException.fromSupabase(e);
   }
-  return repo.searchProducts(search);
 });

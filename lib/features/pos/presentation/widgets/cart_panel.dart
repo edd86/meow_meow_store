@@ -16,7 +16,7 @@ class CartPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final posState = ref.watch(posProvider);
-    final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
+    final currencyFormat = NumberFormat.currency(locale: 'es_BO', symbol: '\$');
 
     return Container(
       decoration: const BoxDecoration(
@@ -73,19 +73,37 @@ class CartPanel extends ConsumerWidget {
                     separatorBuilder: (_, _) => const Divider(),
                     itemBuilder: (context, index) {
                       final item = posState.items[index];
-                      return _CartItemTile(
-                        item: item,
-                        currencyFormat: currencyFormat,
-                        onQuantityChanged: (quantity) {
-                          ref
-                              .read(posProvider.notifier)
-                              .updateQuantity(item.product.id, quantity);
-                        },
-                        onRemove: () {
+                      return Dismissible(
+                        key: ValueKey(item.product.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.only(right: 20),
+                          color: AppColors.error,
+                          child: const Icon(
+                            Icons.delete_outline,
+                            color: AppColors.onError,
+                          ),
+                        ),
+                        onDismissed: (_) {
                           ref
                               .read(posProvider.notifier)
                               .removeItem(item.product.id);
                         },
+                        child: _CartItemTile(
+                          item: item,
+                          currencyFormat: currencyFormat,
+                          onQuantityChanged: (quantity) {
+                            ref
+                                .read(posProvider.notifier)
+                                .updateQuantity(item.product.id, quantity);
+                          },
+                          onRemove: () {
+                            ref
+                                .read(posProvider.notifier)
+                                .removeItem(item.product.id);
+                          },
+                        ),
                       );
                     },
                   ),

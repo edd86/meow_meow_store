@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_snackbar.dart';
 import 'package:meow_meow_store/features/inventory/data/models/product_model.dart';
 import '../providers/pos_provider.dart';
 
@@ -33,13 +34,10 @@ class ProductGrid extends ConsumerWidget {
           priceFormat: currencyFormat,
           onTap: () {
             ref.read(posProvider.notifier).addItem(product);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('${product.name} agregado al carrito'),
-                duration: const Duration(seconds: 1),
-                behavior: SnackBarBehavior.floating,
-                shape: const StadiumBorder(),
-              ),
+            AppSnackBar.show(
+              context,
+              '${product.name} agregado al carrito',
+              duration: const Duration(seconds: 1),
             );
           },
         );
@@ -47,12 +45,7 @@ class ProductGrid extends ConsumerWidget {
     );
   }
 
-  int _getCrossAxisCount(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    if (width < 600) return 2;
-    if (width < 1024) return 3;
-    return 4;
-  }
+  int _getCrossAxisCount(BuildContext context) => 2;
 }
 
 class _ProductCard extends StatelessWidget {
