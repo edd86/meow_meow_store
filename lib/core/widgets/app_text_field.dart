@@ -10,6 +10,7 @@ class AppTextField extends StatelessWidget {
   final bool enabled;
   final ValueChanged<String>? onChanged;
   final bool _isSearch;
+  final TextCapitalization? capitalization;
 
   const AppTextField({
     super.key,
@@ -21,6 +22,7 @@ class AppTextField extends StatelessWidget {
     this.maxLines = 1,
     this.enabled = true,
     this.onChanged,
+    this.capitalization,
   }) : _isSearch = false;
 
   const AppTextField.search({
@@ -34,6 +36,7 @@ class AppTextField extends StatelessWidget {
        prefixText = null,
        maxLines = 1,
        enabled = true,
+       capitalization = TextCapitalization.none,
        _isSearch = true;
 
   @override
@@ -45,6 +48,7 @@ class AppTextField extends StatelessWidget {
       maxLines: maxLines,
       enabled: enabled,
       onChanged: onChanged,
+      textCapitalization: capitalization ?? TextCapitalization.none,
       decoration: InputDecoration(
         labelText: label,
         prefixText: _isSearch ? null : prefixText,
