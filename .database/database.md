@@ -2,41 +2,46 @@
 create extension if not exists "uuid-ossp";
 
 -- 1. CATALOG TABLES
-create table categories (
-id uuid primary key default gen_random_uuid(),
-name varchar(100) not null,
+CREATE TABLE public.categories (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+name character varying NOT NULL,
 description text,
-created_at timestamp with time zone default timezone('utc'::text, now()) not null
+created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+CONSTRAINT categories_pkey PRIMARY KEY (id)
 );
 
-create table products (
-id uuid primary key default gen_random_uuid(),
-category_id uuid references categories(id) on delete set null,
-name varchar(150) not null,
-barcode_qr varchar(100) unique,
+CREATE TABLE public.products (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+category_id uuid,
+name character varying NOT NULL,
+barcode_qr character varying UNIQUE,
 description text,
-buying_price decimal(10, 2) not null check (buying_price >= 0),
-selling_price decimal(10, 2) not null check (selling_price >= 0),
-stock_quantity int default 0 check (stock_quantity >= 0),
-created_at timestamp with time zone default timezone('utc'::text, now()) not null
+buying_price numeric NOT NULL CHECK (buying_price >= 0::numeric),
+selling_price numeric NOT NULL CHECK (selling_price >= 0::numeric),
+stock_quantity integer DEFAULT 0 CHECK (stock_quantity >= 0),
+created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+CONSTRAINT products_pkey PRIMARY KEY (id),
+CONSTRAINT products_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.categories(id)
 );
 
 -- 2. CRM / CUSTOMER TABLES
-create table customers (
-id uuid primary key default gen_random_uuid(),
-first_name varchar(100) not null,
-last_name varchar(100),
-email varchar(150) unique,
-phone varchar(30),
-created_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE public.customers (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+first_name character varying NOT NULL,
+last_name character varying,
+email character varying UNIQUE,
+phone character varying,
+created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+CONSTRAINT customers_pkey PRIMARY KEY (id)
 );
 
 -- 3. CASH REGISTER & SESSION TABLES (Enhanced)
-create table cash_registers (
-id uuid primary key default gen_random_uuid(),
-name varchar(100) default 'Main Cash Register' not null,
-current_balance decimal(12, 2) default 0.00 check (current_balance >= 0),
-updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE public.cash_registers (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+name character varying NOT NULL DEFAULT 'Main Cash Register'::character varying,
+current_balance numeric DEFAULT 0.00 CHECK (current_balance >= 0::numeric),
+updated_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+CONSTRAINT cash_registers_pkey PRIMARY KEY (id)
 );
 
 -- Table to manage open/close sessions (Shifts)
@@ -48,8 +53,6 @@ closed_at timestamp with time zone,
 opening_amount decimal(12, 2) not null check (opening_amount >= 0),
 closing_amount decimal(12, 2) check (closing_amount >= 0), -- Actual physical cash counted at checkout
 status varchar(20) default 'open' check (status in ('open', 'closed')),
-opened_by uuid references auth.users(id) on delete set null, -- Supabase Auth tracking
-closed_by uuid references auth.users(id) on delete set null
 );
 
 -- Insert the default master cash register structure
@@ -57,52 +60,64 @@ insert into cash_registers (name, current_balance)
 values ('General Cash Box', 0.00);
 
 -- 4. SALES MANAGEMENT
-create table sales (
-id uuid primary key default gen_random_uuid(),
-customer_id uuid references customers(id) on delete set null,
-user_id uuid references auth.users(id) on delete set null,
-total_amount decimal(12, 2) default 0.00 check (total_amount >= 0),
-status varchar(20) default 'pending' check (status in ('pending', 'completed', 'cancelled')),
-created_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE public.sales (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+customer_id uuid,
+total_amount numeric DEFAULT 0.00 CHECK (total_amount >= 0::numeric),
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'completed'::character varying, 'cancelled'::character varying]::text[])),
+created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+CONSTRAINT sales_pkey PRIMARY KEY (id),
+CONSTRAINT sales_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id)
 );
 
-create table sale_items (
-id uuid primary key default gen_random_uuid(),
-sale_id uuid references sales(id) on delete cascade not null,
-product_id uuid references products(id) on delete restrict not null,
-quantity int not null check (quantity > 0),
-unit_price decimal(10, 2) not null check (unit_price >= 0),
-total_price decimal(12, 2) generated always as (quantity \* unit_price) stored
+CREATE TABLE public.sale_items (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+sale_id uuid NOT NULL,
+product_id uuid NOT NULL,
+quantity integer NOT NULL CHECK (quantity > 0),
+unit_price numeric NOT NULL CHECK (unit_price >= 0::numeric),
+total_price numeric DEFAULT ((quantity)::numeric \* unit_price),
+CONSTRAINT sale_items_pkey PRIMARY KEY (id),
+CONSTRAINT sale_items_sale_id_fkey FOREIGN KEY (sale_id) REFERENCES public.sales(id),
+CONSTRAINT sale_items_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
 );
 
 -- 5. PURCHASES MANAGEMENT
-create table purchases (
-id uuid primary key default gen_random_uuid(),
-supplier_name varchar(150),
-total_amount decimal(12, 2) default 0.00 check (total_amount >= 0),
-status varchar(20) default 'pending' check (status in ('pending', 'completed', 'cancelled')),
-created_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE public.purchases (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+supplier_name character varying,
+total_amount numeric DEFAULT 0.00 CHECK (total_amount >= 0::numeric),
+status character varying DEFAULT 'pending'::character varying CHECK (status::text = ANY (ARRAY['pending'::character varying, 'completed'::character varying, 'cancelled'::character varying]::text[])),
+created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+CONSTRAINT purchases_pkey PRIMARY KEY (id)
 );
 
-create table purchase_items (
-id uuid primary key default gen_random_uuid(),
-purchase_id uuid references purchases(id) on delete cascade not null,
-product_id uuid references products(id) on delete restrict not null,
-quantity int not null check (quantity > 0),
-unit_price decimal(10, 2) not null check (unit_price >= 0),
-total_price decimal(12, 2) generated always as (quantity \* unit_price) stored
+CREATE TABLE public.purchase_items (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+purchase_id uuid NOT NULL,
+product_id uuid NOT NULL,
+quantity integer NOT NULL CHECK (quantity > 0),
+unit_price numeric NOT NULL CHECK (unit_price >= 0::numeric),
+total_price numeric DEFAULT ((quantity)::numeric \* unit_price),
+CONSTRAINT purchase_items_pkey PRIMARY KEY (id),
+CONSTRAINT purchase_items_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES public.purchases(id),
+CONSTRAINT purchase_items_product_id_fkey FOREIGN KEY (product_id) REFERENCES public.products(id)
 );
 
 -- 6. CASH TRANSACTIONS DETAILED LOG (Linked to Session)
-create table cash_transactions (
-id uuid primary key default gen_random_uuid(),
-session_id uuid references cash_register_sessions(id) on delete restrict not null, -- Linked to the specific shift
-transaction_type varchar(20) not null check (transaction_type in ('income', 'expense')),
-amount decimal(12, 2) not null check (amount > 0),
-description text not null, -- Detailed reason
-sale_id uuid references sales(id) on delete set null,
-purchase_id uuid references purchases(id) on delete set null,
-created_at timestamp with time zone default timezone('utc'::text, now()) not null
+CREATE TABLE public.cash_transactions (
+id uuid NOT NULL DEFAULT gen_random_uuid(),
+session_id uuid NOT NULL,
+transaction_type character varying NOT NULL CHECK (transaction_type::text = ANY (ARRAY['income'::character varying, 'expense'::character varying]::text[])),
+amount numeric NOT NULL CHECK (amount > 0::numeric),
+description text NOT NULL,
+sale_id uuid,
+purchase_id uuid,
+created_at timestamp with time zone NOT NULL DEFAULT timezone('utc'::text, now()),
+CONSTRAINT cash_transactions_pkey PRIMARY KEY (id),
+CONSTRAINT cash_transactions_session_id_fkey FOREIGN KEY (session_id) REFERENCES public.cash_register_sessions(id),
+CONSTRAINT cash_transactions_sale_id_fkey FOREIGN KEY (sale_id) REFERENCES public.sales(id),
+CONSTRAINT cash_transactions_purchase_id_fkey FOREIGN KEY (purchase_id) REFERENCES public.purchases(id)
 );
 
 -- 7. AUTOMATION & INTEGRITY TRIGGERS
@@ -144,7 +159,7 @@ after insert on purchase_items
 for each row execute function update_stock_on_purchase();
 
 
--- C. Automatic Cash Flow Trigger for Sales (Enforces Open Session)
+-- C. Automatic Cash Flow Trigger for Sales (Enforces Open Session on Complete Only)
 create or replace function process_sale_cash_flow()
 returns trigger as
 $$
@@ -152,19 +167,17 @@ $$
 declare
 v_session_id uuid;
 begin
--- Look for the currently active/open session
-select id into v_session_id
-from cash_register_sessions
-where status = 'open'
-limit 1;
+if (tg_op = 'INSERT' and new.status = 'completed') or
+(tg_op = 'UPDATE' and old.status != 'completed' and new.status = 'completed') then
 
-    -- Strict check: block transaction if the cash register is closed
-    if v_session_id is null then
-        raise exception 'Transaction aborted: No active cash register session is currently open. Please open the cash register first.';
-    end if;
+        select id into v_session_id
+        from cash_register_sessions
+        where status = 'open'
+        limit 1;
 
-    if (tg_op = 'INSERT' and new.status = 'completed') or
-       (tg_op = 'UPDATE' and old.status != 'completed' and new.status = 'completed') then
+        if v_session_id is null then
+            raise exception 'No active cash register session is currently open. Please open the cash register first.';
+        end if;
 
         insert into cash_transactions (session_id, transaction_type, amount, description, sale_id)
         values (
@@ -187,7 +200,7 @@ after insert or update on sales
 for each row execute function process_sale_cash_flow();
 
 
--- D. Automatic Cash Flow Trigger for Purchases (Enforces Open Session)
+-- D. Automatic Cash Flow Trigger for Purchases (Enforces Open Session on Complete Only)
 create or replace function process_purchase_cash_flow()
 returns trigger as
 $$
@@ -195,17 +208,17 @@ $$
 declare
 v_session_id uuid;
 begin
-select id into v_session_id
-from cash_register_sessions
-where status = 'open'
-limit 1;
+if (tg_op = 'INSERT' and new.status = 'completed') or
+(tg_op = 'UPDATE' and old.status != 'completed' and new.status = 'completed') then
 
-    if v_session_id is null then
-        raise exception 'Transaction aborted: No active cash register session is currently open. Please open the cash register first.';
-    end if;
+        select id into v_session_id
+        from cash_register_sessions
+        where status = 'open'
+        limit 1;
 
-    if (tg_op = 'INSERT' and new.status = 'completed') or
-       (tg_op = 'UPDATE' and old.status != 'completed' and new.status = 'completed') then
+        if v_session_id is null then
+            raise exception 'No active cash register session is currently open. Please open the cash register first.';
+        end if;
 
         insert into cash_transactions (session_id, transaction_type, amount, description, purchase_id)
         values (
