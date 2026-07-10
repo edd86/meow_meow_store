@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
+import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/core/widgets/app_form_dialog_scaffold.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
@@ -86,26 +88,36 @@ class _CustomerFormDialogState extends ConsumerState<CustomerFormDialog> {
   Future<void> _saveCustomer() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final repo = ref.read(customerRepositoryProvider);
-    final customer = Customer(
-      id: widget.customer?.id ?? '',
-      firstName: _firstNameController.text,
-      lastName:
-          _lastNameController.text.isNotEmpty ? _lastNameController.text : null,
-      email: _emailController.text.isNotEmpty ? _emailController.text : null,
-      phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
-      createdAt: widget.customer?.createdAt ?? DateTime.now(),
-    );
+    try {
+      final repo = ref.read(customerRepositoryProvider);
+      final customer = Customer(
+        id: widget.customer?.id ?? '',
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text.isNotEmpty
+            ? _lastNameController.text
+            : null,
+        email: _emailController.text.isNotEmpty ? _emailController.text : null,
+        phone: _phoneController.text.isNotEmpty ? _phoneController.text : null,
+        createdAt: widget.customer?.createdAt ?? DateTime.now(),
+      );
 
-    if (widget.customer == null) {
-      await repo.createCustomer(customer);
-    } else {
-      await repo.updateCustomer(customer);
-    }
+      if (widget.customer == null) {
+        await repo.createCustomer(customer);
+      } else {
+        await repo.updateCustomer(customer);
+      }
 
-    if (mounted) {
-      ref.invalidate(customersProvider);
-      Navigator.of(context).pop();
+      if (mounted) {
+        ref.invalidate(customersProvider);
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        context.showAppSnackBar(
+          e is AppException ? e.message : 'Error al guardar el cliente.',
+          isError: true,
+        );
+      }
     }
   }
 }

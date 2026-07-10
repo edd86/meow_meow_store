@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/customers_provider.dart';
 import '../widgets/customer_form_dialog.dart';
@@ -53,7 +55,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
           Expanded(
             child: customersAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar clientes.'),
               data: (customers) {
                 if (customers.isEmpty) {
                   return const Center(
