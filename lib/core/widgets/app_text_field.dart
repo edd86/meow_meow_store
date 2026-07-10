@@ -11,6 +11,7 @@ class AppTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final bool _isSearch;
   final TextCapitalization? capitalization;
+  final Color? color;
 
   const AppTextField({
     super.key,
@@ -23,12 +24,14 @@ class AppTextField extends StatelessWidget {
     this.enabled = true,
     this.onChanged,
     this.capitalization,
+    this.color,
   }) : _isSearch = false;
 
   const AppTextField.search({
     super.key,
     required String hintText,
     required TextEditingController this.controller,
+    this.color,
     this.onChanged,
   }) : label = hintText,
        validator = null,
@@ -41,7 +44,9 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inputColor = color ?? Theme.of(context).colorScheme.onSurface;
     return TextFormField(
+      style: TextStyle(color: inputColor),
       controller: controller,
       validator: validator,
       keyboardType: keyboardType,

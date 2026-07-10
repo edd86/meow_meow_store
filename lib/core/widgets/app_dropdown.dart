@@ -6,6 +6,7 @@ class AppDropdown<T> extends StatelessWidget {
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?>? onChanged;
   final String? Function(T?)? validator;
+  final Color? color;
 
   const AppDropdown({
     super.key,
@@ -14,6 +15,7 @@ class AppDropdown<T> extends StatelessWidget {
     this.value,
     this.onChanged,
     this.validator,
+    this.color,
   });
 
   @override
@@ -24,6 +26,7 @@ class AppDropdown<T> extends StatelessWidget {
       items: items,
       onChanged: onChanged,
       validator: validator,
+      style: TextStyle(color: color),
     );
   }
 }
