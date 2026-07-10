@@ -6,8 +6,6 @@ class CashRegisterSession {
   final double openingAmount;
   final double? closingAmount;
   final String status;
-  final String? openedBy;
-  final String? closedBy;
 
   const CashRegisterSession({
     required this.id,
@@ -17,8 +15,6 @@ class CashRegisterSession {
     required this.openingAmount,
     this.closingAmount,
     required this.status,
-    this.openedBy,
-    this.closedBy,
   });
 
   factory CashRegisterSession.fromJson(Map<String, dynamic> json) {
@@ -34,8 +30,6 @@ class CashRegisterSession {
           ? (json['closing_amount'] as num).toDouble()
           : null,
       status: json['status'] as String,
-      openedBy: json['opened_by'] as String?,
-      closedBy: json['closed_by'] as String?,
     );
   }
 
@@ -45,8 +39,6 @@ class CashRegisterSession {
       'opening_amount': openingAmount,
       'closing_amount': closingAmount,
       'status': status,
-      'opened_by': openedBy,
-      'closed_by': closedBy,
     };
   }
 
@@ -58,8 +50,6 @@ class CashRegisterSession {
     double? openingAmount,
     double? closingAmount,
     String? status,
-    String? openedBy,
-    String? closedBy,
   }) {
     return CashRegisterSession(
       id: id ?? this.id,
@@ -69,8 +59,6 @@ class CashRegisterSession {
       openingAmount: openingAmount ?? this.openingAmount,
       closingAmount: closingAmount ?? this.closingAmount,
       status: status ?? this.status,
-      openedBy: openedBy ?? this.openedBy,
-      closedBy: closedBy ?? this.closedBy,
     );
   }
 

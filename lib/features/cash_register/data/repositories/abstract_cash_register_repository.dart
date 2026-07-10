@@ -8,12 +8,10 @@ abstract class AbstractCashRegisterRepository {
   Future<CashRegisterSession> openSession({
     required String cashRegisterId,
     required double openingAmount,
-    String? userId,
   });
   Future<CashRegisterSession> closeSession({
     required String sessionId,
     required double closingAmount,
-    String? userId,
   });
   Future<List<CashTransaction>> getTransactions({
     String? sessionId,

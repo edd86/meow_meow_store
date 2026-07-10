@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/cash_register_provider.dart';
@@ -21,7 +23,7 @@ class CashRegisterPage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Caja')),
       body: sessionAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar sesión de caja.'),
         data: (session) {
           if (session == null) {
             return _ClosedState(onOpen: () => _showOpenDialog(context, ref));
@@ -182,7 +184,7 @@ class _OpenState extends ConsumerWidget {
         Expanded(
           child: transactionsAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Error: $e')),
+            error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar transacciones.'),
             data: (transactions) {
               if (transactions.isEmpty) {
                 return const Center(

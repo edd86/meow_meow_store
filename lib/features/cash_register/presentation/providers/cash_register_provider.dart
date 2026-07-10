@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/exceptions/app_exception.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../data/models/cash_register_session_model.dart';
 import '../../data/models/cash_transaction_model.dart';
@@ -72,5 +73,10 @@ final sessionTransactionsProvider = FutureProvider<List<CashTransaction>>((
   if (session.value == null) return [];
 
   final repo = ref.watch(cashRegisterRepositoryProvider);
-  return repo.getTransactions(sessionId: session.value!.id);
+
+  try {
+    return repo.getTransactions(sessionId: session.value!.id);
+  } catch (e) {
+    throw ServerException.fromSupabase(e);
+  }
 });
