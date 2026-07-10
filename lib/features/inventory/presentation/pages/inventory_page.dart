@@ -4,9 +4,11 @@ import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/product_form_dialog.dart';
 import '../widgets/category_form_dialog.dart';
+import 'scanner_page.dart';
 
 class InventoryPage extends ConsumerStatefulWidget {
   const InventoryPage({super.key});
@@ -17,6 +19,13 @@ class InventoryPage extends ConsumerStatefulWidget {
 
 class _InventoryPageState extends ConsumerState<InventoryPage> {
   String? _selectedCategoryId;
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +36,19 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
       appBar: AppBar(
         title: const Text('Inventario'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () async {
+              final result = await Navigator.of(context).push<String>(
+                MaterialPageRoute(builder: (_) => const ScannerPage()),
+              );
+              if (result != null && result.isNotEmpty) {
+                _searchController.text = result;
+                ref.read(searchQueryProvider.notifier).state = result;
+              }
+            },
+            tooltip: 'Escanear codigo',
+          ),
           IconButton(
             icon: const Icon(Icons.category_outlined),
             onPressed: () => _showCategoryDialog(context),
@@ -79,6 +101,20 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
               ),
             ),
           ),
+          SizedBox(height: AppSpacing.sm),
+          Padding(
+            padding: AppSpacing.horizontalPadding,
+            child: AppTextField.search(
+              hintText: 'Buscar por nombre o codigo',
+              controller: _searchController,
+              onChanged: (value) {
+                ref.read(searchQueryProvider.notifier).state = value.isEmpty
+                    ? null
+                    : value;
+              },
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: productsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),

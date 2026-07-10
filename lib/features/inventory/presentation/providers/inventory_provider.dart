@@ -5,10 +5,17 @@ import '../../data/models/product_model.dart';
 import '../../data/models/category_model.dart';
 
 final selectedCategoryProvider = StateProvider<String?>((ref) => null);
+final searchQueryProvider = StateProvider<String?>((ref) => null);
 
 final inventoryProductsProvider = FutureProvider<List<Product>>((ref) async {
   final categoryId = ref.watch(selectedCategoryProvider);
+  final query = ref.watch(searchQueryProvider);
   final repo = ref.watch(productRepositoryProvider);
+
+  if (query != null && query.isNotEmpty) {
+    return repo.searchProducts(query);
+  }
+
   return repo.getProducts(categoryId: categoryId);
 });
 

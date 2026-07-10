@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/utils/barcode_utils.dart';
 import 'package:meow_meow_store/core/utils/price_utils.dart';
 import 'package:meow_meow_store/core/widgets/app_dropdown.dart';
 import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
@@ -110,6 +111,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                   }
                   return null;
                 },
+                capitalization: TextCapitalization.words,
               ),
               const SizedBox(height: AppSpacing.sm),
               Row(
@@ -223,12 +225,14 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
     if (!_formKey.currentState!.validate()) return;
 
     final repo = ref.read(productRepositoryProvider);
+    final barcodeQr = _barcodeController.text.isNotEmpty
+        ? _barcodeController.text
+        : null;
+
     final product = Product(
       id: widget.product?.id ?? '',
       name: _nameController.text,
-      barcodeQr: _barcodeController.text.isNotEmpty
-          ? _barcodeController.text
-          : null,
+      barcodeQr: barcodeQr,
       description: _descriptionController.text.isNotEmpty
           ? _descriptionController.text
           : null,
@@ -240,9 +244,24 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
     );
 
     if (widget.product == null) {
-      await repo.createProduct(product);
+      final created = await repo.createProduct(product);
+      if (barcodeQr == null) {
+        final generated = BarcodeUtils.generateFromProduct(
+          created.id,
+          created.name,
+        );
+        await repo.updateProduct(created.copyWith(barcodeQr: generated));
+      }
     } else {
-      await repo.updateProduct(product);
+      if (barcodeQr == null) {
+        final generated = BarcodeUtils.generateFromProduct(
+          product.id,
+          product.name,
+        );
+        await repo.updateProduct(product.copyWith(barcodeQr: generated));
+      } else {
+        await repo.updateProduct(product);
+      }
     }
 
     if (mounted) {
