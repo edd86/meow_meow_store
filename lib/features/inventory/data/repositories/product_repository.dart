@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/features/inventory/data/models/product_model.dart';
 import 'abstract_product_repository.dart';
 
@@ -10,68 +11,92 @@ class ProductRepository implements AbstractProductRepository {
 
   @override
   Future<List<Product>> getProducts({String? categoryId}) async {
-    var query = _client.from('products').select();
+    try {
+      var query = _client.from('products').select();
 
-    if (categoryId != null) {
-      query = query.eq('category_id', categoryId);
+      if (categoryId != null) {
+        query = query.eq('category_id', categoryId);
+      }
+
+      final response = await query.order('name');
+
+      return (response as List)
+          .map((json) => Product.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
     }
-
-    final response = await query.order('name');
-
-    return (response as List)
-        .map((json) => Product.fromJson(json as Map<String, dynamic>))
-        .toList();
   }
 
   @override
   Future<Product> getProduct(String id) async {
-    final response = await _client
-        .from('products')
-        .select()
-        .eq('id', id)
-        .single();
+    try {
+      final response = await _client
+          .from('products')
+          .select()
+          .eq('id', id)
+          .single();
 
-    return Product.fromJson(response);
+      return Product.fromJson(response);
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 
   @override
   Future<Product> createProduct(Product product) async {
-    final response = await _client
-        .from('products')
-        .insert(product.toJson())
-        .select()
-        .single();
+    try {
+      final response = await _client
+          .from('products')
+          .insert(product.toJson())
+          .select()
+          .single();
 
-    return Product.fromJson(response);
+      return Product.fromJson(response);
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 
   @override
   Future<Product> updateProduct(Product product) async {
-    final response = await _client
-        .from('products')
-        .update(product.toJson())
-        .eq('id', product.id)
-        .select()
-        .single();
+    try {
+      final response = await _client
+          .from('products')
+          .update(product.toJson())
+          .eq('id', product.id)
+          .select()
+          .single();
 
-    return Product.fromJson(response);
+      return Product.fromJson(response);
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 
   @override
   Future<void> deleteProduct(String id) async {
-    await _client.from('products').delete().eq('id', id);
+    try {
+      await _client.from('products').delete().eq('id', id);
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 
   @override
   Future<List<Product>> searchProducts(String query) async {
-    final response = await _client
-        .from('products')
-        .select()
-        .or('name.ilike.%$query%,barcode_qr.ilike.%$query%')
-        .order('name');
+    try {
+      final response = await _client
+          .from('products')
+          .select()
+          .or('name.ilike.%$query%,barcode_qr.ilike.%$query%')
+          .order('name');
 
-    return (response as List)
-        .map((json) => Product.fromJson(json as Map<String, dynamic>))
-        .toList();
+      return (response as List)
+          .map((json) => Product.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 }

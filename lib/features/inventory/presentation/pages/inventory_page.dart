@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
+import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/product_form_dialog.dart';
@@ -66,7 +68,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
             height: 50,
             child: categoriesAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar categorías.'),
               data: (categories) => ListView(
                 scrollDirection: Axis.horizontal,
                 padding: AppSpacing.horizontalPadding,
@@ -118,7 +120,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
           Expanded(
             child: productsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Center(child: Text('Error: $e')),
+              error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar productos.'),
               data: (products) {
                 if (products.isEmpty) {
                   return const Center(

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
+import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/core/widgets/app_form_dialog_scaffold.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
@@ -55,21 +57,30 @@ class _CategoryFormDialogState extends ConsumerState<CategoryFormDialog> {
   Future<void> _saveCategory() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final repo = ref.read(categoryRepositoryProvider);
-    final category = Category(
-      id: '',
-      name: _nameController.text,
-      description: _descriptionController.text.isNotEmpty
-          ? _descriptionController.text
-          : null,
-      createdAt: DateTime.now(),
-    );
+    try {
+      final repo = ref.read(categoryRepositoryProvider);
+      final category = Category(
+        id: '',
+        name: _nameController.text,
+        description: _descriptionController.text.isNotEmpty
+            ? _descriptionController.text
+            : null,
+        createdAt: DateTime.now(),
+      );
 
-    await repo.createCategory(category);
+      await repo.createCategory(category);
 
-    if (mounted) {
-      ref.invalidate(categoriesProvider);
-      Navigator.of(context).pop();
+      if (mounted) {
+        ref.invalidate(categoriesProvider);
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        context.showAppSnackBar(
+          e is AppException ? e.message : 'Error al guardar la categoría.',
+          isError: true,
+        );
+      }
     }
   }
 }
