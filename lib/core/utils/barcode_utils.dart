@@ -11,10 +11,3 @@ abstract final class BarcodeUtils {
     return jsonDecode(decoded) as Map<String, dynamic>;
   }
 }
-
-  static Map<String, dynamic> decode(String value) {
-    final decodedBytes = base64Url.decode(value);
-    final decodedJson = utf8.decode(decodedBytes);
-    return jsonDecode(decodedJson) as Map<String, dynamic>;
-  }
-}
