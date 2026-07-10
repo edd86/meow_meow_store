@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
-
 class AppElevatedButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final bool fullWidth;
   final IconData? icon;
-  final Color? backgroundColor;
-  final Color? foregroundColor;
   final bool _isOutline;
   final bool _isGhost;
+  final bool _isDanger;
 
   const AppElevatedButton({
     super.key,
@@ -18,10 +15,9 @@ class AppElevatedButton extends StatelessWidget {
     required this.onPressed,
     this.fullWidth = false,
     this.icon,
-    this.backgroundColor,
-    this.foregroundColor,
   }) : _isOutline = false,
-       _isGhost = false;
+       _isGhost = false,
+       _isDanger = false;
 
   const AppElevatedButton.primary({
     super.key,
@@ -29,10 +25,9 @@ class AppElevatedButton extends StatelessWidget {
     required this.onPressed,
     this.fullWidth = false,
     this.icon,
-  }) : backgroundColor = null,
-       foregroundColor = null,
-       _isOutline = false,
-       _isGhost = false;
+  }) : _isOutline = false,
+       _isGhost = false,
+       _isDanger = false;
 
   const AppElevatedButton.danger({
     super.key,
@@ -40,10 +35,9 @@ class AppElevatedButton extends StatelessWidget {
     required this.onPressed,
     this.fullWidth = false,
   }) : icon = null,
-       backgroundColor = AppColors.error,
-       foregroundColor = AppColors.onError,
        _isOutline = false,
-       _isGhost = false;
+       _isGhost = false,
+       _isDanger = true;
 
   const AppElevatedButton.outline({
     super.key,
@@ -51,10 +45,9 @@ class AppElevatedButton extends StatelessWidget {
     required this.onPressed,
     this.fullWidth = false,
   }) : icon = null,
-       backgroundColor = Colors.transparent,
-       foregroundColor = AppColors.primary,
        _isOutline = true,
-       _isGhost = false;
+       _isGhost = false,
+       _isDanger = false;
 
   const AppElevatedButton.ghost({
     super.key,
@@ -62,19 +55,36 @@ class AppElevatedButton extends StatelessWidget {
     required this.onPressed,
     this.fullWidth = false,
   }) : icon = null,
-       backgroundColor = Colors.transparent,
-       foregroundColor = AppColors.primary,
        _isOutline = false,
-       _isGhost = true;
+       _isGhost = true,
+       _isDanger = false;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    Color? bgColor;
+    Color? fgColor;
+    Color? sideColor;
+
+    if (_isDanger) {
+      bgColor = colorScheme.error;
+      fgColor = colorScheme.onError;
+    } else if (_isOutline) {
+      bgColor = Colors.transparent;
+      fgColor = colorScheme.primary;
+      sideColor = colorScheme.primary;
+    } else if (_isGhost) {
+      bgColor = Colors.transparent;
+      fgColor = colorScheme.primary;
+    }
+
     final button = ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        side: _isOutline ? BorderSide(color: AppColors.primary) : null,
+        backgroundColor: bgColor,
+        foregroundColor: fgColor,
+        side: sideColor != null ? BorderSide(color: sideColor) : null,
         elevation: _isGhost ? 0 : null,
         shadowColor: _isGhost ? Colors.transparent : null,
         surfaceTintColor: _isGhost ? Colors.transparent : null,

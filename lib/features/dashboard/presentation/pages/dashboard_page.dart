@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
-import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import '../providers/dashboard_provider.dart';
@@ -14,23 +13,38 @@ class DashboardPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final statsAsync = ref.watch(dashboardStatsProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Meow Meow Store')),
       body: statsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar el dashboard.'),
+        error: (e, _) => AppErrorView(
+          message: e is AppException
+              ? e.message
+              : 'Error al cargar el dashboard.',
+        ),
         data: (stats) => SingleChildScrollView(
           padding: AppSpacing.pagePadding,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Resumen del Dia', style: context.textTheme.headlineSmall),
+              Text(
+                'Resumen del Dia',
+                style: context.textTheme.headlineSmall?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
               _StatsGrid(stats: stats),
               const SizedBox(height: AppSpacing.lg),
-              Text('Acciones Rapidas', style: context.textTheme.headlineSmall),
+              Text(
+                'Acciones Rapidas',
+                style: context.textTheme.headlineSmall?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
               _QuickActions(),
             ],
@@ -48,6 +62,7 @@ class _StatsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
 
     return GridView.count(
@@ -62,25 +77,25 @@ class _StatsGrid extends StatelessWidget {
           title: 'Ventas Hoy',
           value: currencyFormat.format(stats.todaySales),
           icon: Icons.trending_up,
-          color: AppColors.primary,
+          color: colorScheme.primary,
         ),
         _StatCard(
           title: 'Transacciones',
           value: stats.todayTransactions.toString(),
           icon: Icons.receipt_long,
-          color: AppColors.secondary,
+          color: colorScheme.secondary,
         ),
         _StatCard(
           title: 'Productos',
           value: stats.totalProducts.toString(),
           icon: Icons.inventory_2,
-          color: AppColors.tertiary,
+          color: colorScheme.tertiary,
         ),
         _StatCard(
           title: 'Clientes',
           value: stats.totalCustomers.toString(),
           icon: Icons.people,
-          color: AppColors.primary,
+          color: colorScheme.primary,
         ),
       ],
     );
@@ -102,6 +117,7 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       child: Padding(
         padding: AppSpacing.pagePadding,
@@ -117,12 +133,13 @@ class _StatCard extends StatelessWidget {
                   value,
                   style: context.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
                 Text(
                   title,
                   style: context.textTheme.bodySmall?.copyWith(
-                    color: AppColors.onSurfaceVariant,
+                    color: colorScheme.onSurfaceVariant,
                   ),
                 ),
               ],
@@ -178,6 +195,7 @@ class _ActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       child: InkWell(
         onTap: onTap,
@@ -186,12 +204,17 @@ class _ActionCard extends StatelessWidget {
           padding: AppSpacing.horizontalPadding,
           child: Row(
             children: [
-              Icon(icon, color: AppColors.primary),
+              Icon(icon, color: colorScheme.primary),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(title, style: context.textTheme.titleMedium),
+                child: Text(
+                  title,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                  ),
+                ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.outline),
+              Icon(Icons.chevron_right, color: colorScheme.outline),
             ],
           ),
         ),

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
-import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/core/utils/barcode_utils.dart';
@@ -121,9 +120,9 @@ class _POSPageState extends ConsumerState<POSPage> {
   }
 
   Future<void> _scanAndAddToCart(BuildContext context, WidgetRef ref) async {
-    final result = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) => const ScannerPage()),
-    );
+    final result = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => const ScannerPage()));
     if (result == null || result.isEmpty) return;
 
     try {
@@ -171,64 +170,77 @@ class _POSPageState extends ConsumerState<POSPage> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) => Padding(
-        padding: AppSpacing.pagePadding,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.outlineVariant,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text('Confirmar Venta', style: context.textTheme.headlineSmall),
-            const SizedBox(height: AppSpacing.lg),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Total a cobrar', style: context.textTheme.titleLarge),
-                Text(
-                  currencyFormat.format(posState.totalAmount),
-                  style: context.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.primary,
+      builder: (context) {
+        final colorScheme = Theme.of(context).colorScheme;
+        return Padding(
+          padding: AppSpacing.pagePadding,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            AppElevatedButton.primary(
-              label: 'Completar Venta',
-              onPressed: () async {
-                try {
-                  await ref.read(posProvider.notifier).completeSale();
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                    context.showAppSnackBar('Venta completada exitosamente');
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Confirmar Venta',
+                style: context.textTheme.headlineSmall!.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Total a cobrar',
+                    style: context.textTheme.titleLarge!.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  Text(
+                    currencyFormat.format(posState.totalAmount),
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              AppElevatedButton.primary(
+                label: 'Completar Venta',
+                onPressed: () async {
+                  try {
+                    await ref.read(posProvider.notifier).completeSale();
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      context.showAppSnackBar('Venta completada exitosamente');
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      context.showAppSnackBar(
+                        e is AppException
+                            ? e.message
+                            : 'Error al completar la venta.',
+                        isError: true,
+                      );
+                    }
                   }
-                } catch (e) {
-                  if (context.mounted) {
-                    context.showAppSnackBar(
-                      e is AppException
-                          ? e.message
-                          : 'Error al completar la venta.',
-                      isError: true,
-                    );
-                  }
-                }
-              },
-              fullWidth: true,
-            ),
-          ],
-        ),
-      ),
+                },
+                fullWidth: true,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

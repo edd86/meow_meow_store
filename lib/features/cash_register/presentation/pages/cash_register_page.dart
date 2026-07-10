@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
-import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
@@ -108,18 +107,19 @@ class _ClosedState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.lock_outline, size: 64, color: AppColors.outline),
+          Icon(Icons.lock_outline, size: 64, color: colorScheme.outline),
           const SizedBox(height: AppSpacing.md),
           Text('Caja Cerrada', style: context.textTheme.headlineMedium),
           const SizedBox(height: AppSpacing.sm),
           Text(
             'Abre la caja para comenzar a operar',
             style: context.textTheme.bodyMedium?.copyWith(
-              color: AppColors.onSurfaceVariant,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -147,13 +147,14 @@ class _OpenState extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
 
     return Column(
       children: [
         Container(
           padding: AppSpacing.pagePadding,
-          color: AppColors.primaryContainer,
+          color: colorScheme.primaryContainer,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -163,13 +164,13 @@ class _OpenState extends ConsumerWidget {
                   Text(
                     'Sesion Abierta',
                     style: context.textTheme.titleMedium?.copyWith(
-                      color: AppColors.onPrimaryContainer,
+                      color: colorScheme.onPrimaryContainer,
                     ),
                   ),
                   Text(
                     'Monto de apertura: ${currencyFormat.format(session.openingAmount)}',
                     style: context.textTheme.bodySmall?.copyWith(
-                      color: AppColors.onPrimaryContainer,
+                      color: colorScheme.onPrimaryContainer,
                     ),
                   ),
                 ],
@@ -200,13 +201,13 @@ class _OpenState extends ConsumerWidget {
                   return ListTile(
                     leading: CircleAvatar(
                       backgroundColor: tx.isIncome
-                          ? AppColors.primaryContainer
-                          : AppColors.errorContainer,
+                          ? colorScheme.primaryContainer
+                          : colorScheme.errorContainer,
                       child: Icon(
                         tx.isIncome ? Icons.arrow_downward : Icons.arrow_upward,
                         color: tx.isIncome
-                            ? AppColors.onPrimaryContainer
-                            : AppColors.onErrorContainer,
+                            ? colorScheme.onPrimaryContainer
+                            : colorScheme.onErrorContainer,
                         size: 20,
                       ),
                     ),
@@ -218,8 +219,8 @@ class _OpenState extends ConsumerWidget {
                       '${tx.isIncome ? '+' : '-'}${currencyFormat.format(tx.amount)}',
                       style: context.textTheme.titleMedium?.copyWith(
                         color: tx.isIncome
-                            ? AppColors.primary
-                            : AppColors.error,
+                            ? colorScheme.primary
+                            : colorScheme.error,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
-import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
@@ -101,12 +100,13 @@ class _CustomerList extends StatelessWidget {
       separatorBuilder: (_, _) => const Divider(),
       itemBuilder: (context, index) {
         final customer = customers[index];
+        final colorScheme = Theme.of(context).colorScheme;
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: AppColors.primaryContainer,
+            backgroundColor: colorScheme.primaryContainer,
             child: Text(
               customer.firstName.substring(0, 1).toUpperCase(),
-              style: const TextStyle(color: AppColors.onPrimaryContainer),
+              style: TextStyle(color: colorScheme.onPrimaryContainer),
             ),
           ),
           title: Text(customer.fullName),

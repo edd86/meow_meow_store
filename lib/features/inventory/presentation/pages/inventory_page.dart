@@ -3,12 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
-import 'package:meow_meow_store/core/theme/app_colors.dart';
+import 'package:meow_meow_store/core/extensions/context_x.dart';
+import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/product_form_dialog.dart';
+import '../widgets/product_qr_dialog.dart';
 import '../widgets/category_form_dialog.dart';
 import 'scanner_page.dart';
 
@@ -68,7 +70,11 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
             height: 50,
             child: categoriesAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar categorías.'),
+              error: (e, _) => AppErrorView(
+                message: e is AppException
+                    ? e.message
+                    : 'Error al cargar categorías.',
+              ),
               data: (categories) => ListView(
                 scrollDirection: Axis.horizontal,
                 padding: AppSpacing.horizontalPadding,
@@ -120,20 +126,52 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
           Expanded(
             child: productsAsync.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar productos.'),
+              error: (e, _) => AppErrorView(
+                message: e is AppException
+                    ? e.message
+                    : 'Error al cargar productos.',
+              ),
               data: (products) {
                 if (products.isEmpty) {
                   return const Center(
                     child: Text('No hay productos en el inventario'),
                   );
                 }
-                return _ProductList(products: products);
+                return _ProductList(
+                  products: products,
+                  onEdit: (product) =>
+                      _showProductDialog(context, product: product),
+                  onDelete: (product) => _deleteProduct(context, ref, product),
+                  onShowQr: (product) => _showQrDialog(context, product),
+                );
               },
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _deleteProduct(
+    BuildContext context,
+    WidgetRef ref,
+    dynamic product,
+  ) async {
+    try {
+      final repo = ref.read(productRepositoryProvider);
+      await repo.deleteProduct(product.id as String);
+      ref.invalidate(inventoryProductsProvider);
+      if (context.mounted) {
+        context.showAppSnackBar('${product.name} eliminado del inventario');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        context.showAppSnackBar(
+          e is AppException ? e.message : 'Error al eliminar el producto.',
+          isError: true,
+        );
+      }
+    }
   }
 
   void _showProductDialog(BuildContext context, {dynamic product}) {
@@ -144,6 +182,20 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) => ProductFormDialog(product: product),
+    );
+  }
+
+  void _showQrDialog(BuildContext context, dynamic product) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => ProductQrDialog(
+        productName: product.name,
+        qrValue: product.barcodeQr ?? '',
+      ),
     );
   }
 
@@ -161,8 +213,16 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
 
 class _ProductList extends StatelessWidget {
   final List products;
+  final void Function(dynamic) onEdit;
+  final void Function(dynamic) onDelete;
+  final void Function(dynamic) onShowQr;
 
-  const _ProductList({required this.products});
+  const _ProductList({
+    required this.products,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onShowQr,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -173,30 +233,69 @@ class _ProductList extends StatelessWidget {
       itemCount: products.length,
       separatorBuilder: (_, _) => const Divider(),
       itemBuilder: (context, index) {
+        final colorScheme = Theme.of(context).colorScheme;
         final product = products[index];
-        return ListTile(
-          leading: CircleAvatar(
-            backgroundColor: AppColors.primaryContainer,
-            child: Text(
-              product.name.substring(0, 1).toUpperCase(),
-              style: const TextStyle(color: AppColors.onPrimaryContainer),
-            ),
+        return Dismissible(
+          key: ValueKey(product.id),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            color: colorScheme.error,
+            child: Icon(Icons.delete_outline, color: colorScheme.onError),
           ),
-          title: Text(product.name),
-          subtitle: Text(
-            'Stock: ${product.stockQuantity} | '
-            '${currencyFormat.format(product.sellingPrice)}',
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (product.isLowStock)
-                const Icon(Icons.warning, color: AppColors.error, size: 20),
-              IconButton(
-                icon: const Icon(Icons.edit_outlined, size: 20),
-                onPressed: () {},
+          confirmDismiss: (_) async {
+            final confirmed = await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('Eliminar producto'),
+                content: Text('¿Estás seguro de eliminar "${product.name}"?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(false),
+                    child: const Text('Cancelar'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(ctx).pop(true),
+                    style: TextButton.styleFrom(
+                      foregroundColor: colorScheme.error,
+                    ),
+                    child: const Text('Eliminar'),
+                  ),
+                ],
               ),
-            ],
+            );
+            return confirmed ?? false;
+          },
+          onDismissed: (_) => onDelete(product),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: colorScheme.primaryContainer,
+              child: Text(
+                product.name.substring(0, 1).toUpperCase(),
+                style: TextStyle(color: colorScheme.onPrimaryContainer),
+              ),
+            ),
+            title: Text(product.name),
+            subtitle: Text(
+              'Stock: ${product.stockQuantity} | '
+              '${currencyFormat.format(product.sellingPrice)}',
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (product.isLowStock)
+                  Icon(Icons.warning, color: colorScheme.error, size: 20),
+                IconButton(
+                  icon: const Icon(Icons.qr_code, size: 20),
+                  onPressed: () => onShowQr(product),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 20),
+                  onPressed: () => onEdit(product),
+                ),
+              ],
+            ),
           ),
         );
       },

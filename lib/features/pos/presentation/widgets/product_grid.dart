@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/extensions/context_x.dart';
-import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_snackbar.dart';
 import 'package:meow_meow_store/features/inventory/data/models/product_model.dart';
@@ -61,6 +60,7 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -72,11 +72,11 @@ class _ProductCard extends StatelessWidget {
               flex: 3,
               child: Container(
                 width: double.infinity,
-                color: AppColors.surfaceContainerHigh,
-                child: const Icon(
+                color: colorScheme.surfaceContainerHigh,
+                child: Icon(
                   Icons.inventory_2,
                   size: 48,
-                  color: AppColors.outline,
+                  color: colorScheme.outline,
                 ),
               ),
             ),
@@ -90,7 +90,10 @@ class _ProductCard extends StatelessWidget {
                   children: [
                     Text(
                       product.name,
-                      style: context.textTheme.labelLarge,
+                      style: context.textTheme.labelLarge!.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -101,7 +104,7 @@ class _ProductCard extends StatelessWidget {
                           priceFormat.format(product.sellingPrice),
                           style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
+                            color: colorScheme.primary,
                           ),
                         ),
                         if (product.isLowStock)
@@ -111,13 +114,13 @@ class _ProductCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: AppColors.errorContainer,
+                              color: colorScheme.errorContainer,
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
                               'Stock: ${product.stockQuantity}',
                               style: context.textTheme.labelSmall?.copyWith(
-                                color: AppColors.onErrorContainer,
+                                color: colorScheme.onErrorContainer,
                               ),
                             ),
                           ),

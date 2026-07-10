@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:meow_meow_store/core/theme/app_colors.dart';
-
 class ShellScaffold extends StatelessWidget {
   final Widget child;
 
@@ -10,6 +8,7 @@ class ShellScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final location = GoRouterState.of(context).uri.path;
 
     int selectedIndex = 0;
@@ -41,12 +40,12 @@ class ShellScaffold extends StatelessWidget {
               context.go('/cash-register');
           }
         },
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
             selectedIcon: Icon(
               Icons.dashboard,
-              color: AppColors.onPrimaryContainer,
+              color: colorScheme.onPrimaryContainer,
             ),
             label: 'Inicio',
           ),
@@ -54,7 +53,7 @@ class ShellScaffold extends StatelessWidget {
             icon: Icon(Icons.point_of_sale_outlined),
             selectedIcon: Icon(
               Icons.point_of_sale,
-              color: AppColors.onPrimaryContainer,
+              color: colorScheme.onPrimaryContainer,
             ),
             label: 'POS',
           ),
@@ -62,7 +61,7 @@ class ShellScaffold extends StatelessWidget {
             icon: Icon(Icons.inventory_2_outlined),
             selectedIcon: Icon(
               Icons.inventory_2,
-              color: AppColors.onPrimaryContainer,
+              color: colorScheme.onPrimaryContainer,
             ),
             label: 'Inventario',
           ),
@@ -70,7 +69,7 @@ class ShellScaffold extends StatelessWidget {
             icon: Icon(Icons.people_outline),
             selectedIcon: Icon(
               Icons.people,
-              color: AppColors.onPrimaryContainer,
+              color: colorScheme.onPrimaryContainer,
             ),
             label: 'Clientes',
           ),
@@ -78,7 +77,7 @@ class ShellScaffold extends StatelessWidget {
             icon: Icon(Icons.payments_outlined),
             selectedIcon: Icon(
               Icons.payments,
-              color: AppColors.onPrimaryContainer,
+              color: colorScheme.onPrimaryContainer,
             ),
             label: 'Caja',
           ),

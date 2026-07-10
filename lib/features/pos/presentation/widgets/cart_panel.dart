@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/extensions/context_x.dart';
-import 'package:meow_meow_store/core/theme/app_colors.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
 import '../providers/pos_provider.dart';
@@ -15,22 +14,25 @@ class CartPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final posState = ref.watch(posProvider);
     final currencyFormat = NumberFormat.currency(locale: 'es_BO', symbol: '\$');
 
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        border: Border(left: BorderSide(color: AppColors.surfaceVariant)),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLowest,
+        border: Border(
+          left: BorderSide(color: colorScheme.surfaceContainerHighest),
+        ),
       ),
       child: Column(
         children: [
           Container(
             padding: AppSpacing.pagePadding,
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceContainerLow,
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerLow,
               border: Border(
-                bottom: BorderSide(color: AppColors.surfaceVariant),
+                bottom: BorderSide(color: colorScheme.surfaceContainerHighest),
               ),
             ),
             child: Row(
@@ -50,19 +52,19 @@ class CartPanel extends ConsumerWidget {
           ),
           Expanded(
             child: posState.items.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
                           Icons.shopping_cart_outlined,
                           size: 64,
-                          color: AppColors.outlineVariant,
+                          color: colorScheme.outlineVariant,
                         ),
                         SizedBox(height: AppSpacing.sm),
                         Text(
                           'Carrito vacio',
-                          style: TextStyle(color: AppColors.outline),
+                          style: TextStyle(color: colorScheme.outline),
                         ),
                       ],
                     ),
@@ -79,10 +81,10 @@ class CartPanel extends ConsumerWidget {
                         background: Container(
                           alignment: Alignment.centerRight,
                           padding: const EdgeInsets.only(right: 20),
-                          color: AppColors.error,
-                          child: const Icon(
+                          color: colorScheme.error,
+                          child: Icon(
                             Icons.delete_outline,
-                            color: AppColors.onError,
+                            color: colorScheme.onError,
                           ),
                         ),
                         onDismissed: (_) {
@@ -110,9 +112,11 @@ class CartPanel extends ConsumerWidget {
           ),
           Container(
             padding: AppSpacing.pagePadding,
-            decoration: const BoxDecoration(
-              color: AppColors.surfaceContainerLow,
-              border: Border(top: BorderSide(color: AppColors.surfaceVariant)),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerLow,
+              border: Border(
+                top: BorderSide(color: colorScheme.surfaceContainerHighest),
+              ),
             ),
             child: Column(
               children: [
@@ -124,7 +128,7 @@ class CartPanel extends ConsumerWidget {
                       currencyFormat.format(posState.totalAmount),
                       style: context.textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                        color: colorScheme.primary,
                       ),
                     ),
                   ],
@@ -159,6 +163,7 @@ class _CartItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Expanded(
@@ -167,14 +172,17 @@ class _CartItemTile extends StatelessWidget {
             children: [
               Text(
                 item.product.name,
-                style: context.textTheme.labelLarge,
+                style: context.textTheme.labelLarge!.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colorScheme.onSurfaceVariant,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
                 currencyFormat.format(item.product.sellingPrice),
                 style: context.textTheme.bodySmall?.copyWith(
-                  color: AppColors.onSurfaceVariant,
+                  color: colorScheme.onSurfaceVariant,
                 ),
               ),
             ],
@@ -186,7 +194,13 @@ class _CartItemTile extends StatelessWidget {
               icon: const Icon(Icons.remove_circle_outline, size: 20),
               onPressed: () => onQuantityChanged(item.quantity - 1),
             ),
-            Text('${item.quantity}', style: context.textTheme.titleMedium),
+            Text(
+              '${item.quantity}',
+              style: context.textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.w600,
+                color: colorScheme.onSurface,
+              ),
+            ),
             IconButton(
               icon: const Icon(Icons.add_circle_outline, size: 20),
               onPressed: () => onQuantityChanged(item.quantity + 1),
@@ -197,10 +211,11 @@ class _CartItemTile extends StatelessWidget {
           currencyFormat.format(item.totalPrice),
           style: context.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
+            color: colorScheme.onSurfaceVariant,
           ),
         ),
         IconButton(
-          icon: const Icon(Icons.close, size: 18, color: AppColors.error),
+          icon: Icon(Icons.close, size: 18, color: colorScheme.error),
           onPressed: onRemove,
         ),
       ],
