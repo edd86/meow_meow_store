@@ -88,6 +88,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
   @override
   Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(categoriesProvider);
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -109,6 +110,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
               AppTextField(
                 label: 'Nombre del producto',
                 controller: _nameController,
+                color: colorScheme.onSurface,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'El nombre es requerido';
@@ -125,6 +127,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                     child: AppTextField(
                       label: 'Codigo de barras / QR',
                       controller: _barcodeController,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   IconButton(
@@ -144,15 +147,19 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
               AppTextField(
                 label: 'Descripcion',
                 controller: _descriptionController,
+                color: colorScheme.onSurface,
                 maxLines: 2,
               ),
               const SizedBox(height: AppSpacing.sm),
               categoriesAsync.when(
                 loading: () => const LinearProgressIndicator(),
-                error: (e, _) => Text(e is AppException ? e.message : 'Error al cargar categorías.'),
+                error: (e, _) => Text(
+                  e is AppException ? e.message : 'Error al cargar categorías.',
+                ),
                 data: (categories) => AppDropdown<String>(
                   label: 'Categoria',
                   value: _selectedCategoryId,
+                  color: colorScheme.onSurface,
                   items: categories
                       .map(
                         (cat) => DropdownMenuItem(
@@ -185,6 +192,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                       onChanged: (value) {
                         _scheduleSuggestedSellingPrice();
                       },
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
@@ -201,6 +209,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                         }
                         return null;
                       },
+                      color: colorScheme.onSurface,
                     ),
                   ),
                 ],
@@ -210,6 +219,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                 label: 'Cantidad en stock',
                 controller: _stockController,
                 keyboardType: TextInputType.number,
+                color: colorScheme.onSurface,
               ),
               const SizedBox(height: AppSpacing.lg),
               AppElevatedButton.primary(
