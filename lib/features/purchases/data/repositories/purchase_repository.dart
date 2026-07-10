@@ -1,5 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/features/purchases/data/models/purchase_model.dart';
 import 'abstract_purchase_repository.dart';
 
@@ -10,28 +11,36 @@ class PurchaseRepository implements AbstractPurchaseRepository {
 
   @override
   Future<List<Purchase>> getPurchases({String? status}) async {
-    var query = _client.from('purchases').select();
+    try {
+      var query = _client.from('purchases').select();
 
-    if (status != null) {
-      query = query.eq('status', status);
+      if (status != null) {
+        query = query.eq('status', status);
+      }
+
+      final response = await query.order('created_at', ascending: false);
+
+      return (response as List)
+          .map((json) => Purchase.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
     }
-
-    final response = await query.order('created_at', ascending: false);
-
-    return (response as List)
-        .map((json) => Purchase.fromJson(json as Map<String, dynamic>))
-        .toList();
   }
 
   @override
   Future<Purchase> getPurchase(String id) async {
-    final response = await _client
-        .from('purchases')
-        .select('*, purchase_items(*)')
-        .eq('id', id)
-        .single();
+    try {
+      final response = await _client
+          .from('purchases')
+          .select('*, purchase_items(*)')
+          .eq('id', id)
+          .single();
 
-    return Purchase.fromJson(response);
+      return Purchase.fromJson(response);
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 
   @override
@@ -39,58 +48,70 @@ class PurchaseRepository implements AbstractPurchaseRepository {
     String? supplierName,
     required List<PurchaseItem> items,
   }) async {
-    final totalAmount = items.fold<double>(
-      0,
-      (sum, item) => sum + item.totalPrice,
-    );
+    try {
+      final totalAmount = items.fold<double>(
+        0,
+        (sum, item) => sum + item.totalPrice,
+      );
 
-    final purchaseResponse = await _client
-        .from('purchases')
-        .insert({
-          'supplier_name': supplierName,
-          'total_amount': totalAmount,
-          'status': 'pending',
-        })
-        .select()
-        .single();
+      final purchaseResponse = await _client
+          .from('purchases')
+          .insert({
+            'supplier_name': supplierName,
+            'total_amount': totalAmount,
+            'status': 'pending',
+          })
+          .select()
+          .single();
 
-    final purchase = Purchase.fromJson(purchaseResponse);
+      final purchase = Purchase.fromJson(purchaseResponse);
 
-    final purchaseItems = items.map((item) {
-      return {
-        'purchase_id': purchase.id,
-        'product_id': item.productId,
-        'quantity': item.quantity,
-        'unit_price': item.unitPrice,
-      };
-    }).toList();
+      final purchaseItems = items.map((item) {
+        return {
+          'purchase_id': purchase.id,
+          'product_id': item.productId,
+          'quantity': item.quantity,
+          'unit_price': item.unitPrice,
+        };
+      }).toList();
 
-    await _client.from('purchase_items').insert(purchaseItems);
+      await _client.from('purchase_items').insert(purchaseItems);
 
-    return purchase;
+      return purchase;
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 
   @override
   Future<Purchase> completePurchase(String purchaseId) async {
-    final response = await _client
-        .from('purchases')
-        .update({'status': 'completed'})
-        .eq('id', purchaseId)
-        .select()
-        .single();
+    try {
+      final response = await _client
+          .from('purchases')
+          .update({'status': 'completed'})
+          .eq('id', purchaseId)
+          .select()
+          .single();
 
-    return Purchase.fromJson(response);
+      return Purchase.fromJson(response);
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 
   @override
   Future<Purchase> cancelPurchase(String purchaseId) async {
-    final response = await _client
-        .from('purchases')
-        .update({'status': 'cancelled'})
-        .eq('id', purchaseId)
-        .select()
-        .single();
+    try {
+      final response = await _client
+          .from('purchases')
+          .update({'status': 'cancelled'})
+          .eq('id', purchaseId)
+          .select()
+          .single();
 
-    return Purchase.fromJson(response);
+      return Purchase.fromJson(response);
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
   }
 }
