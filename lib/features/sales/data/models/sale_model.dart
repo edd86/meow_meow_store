@@ -1,7 +1,6 @@
 class Sale {
   final String id;
   final String? customerId;
-  final String? userId;
   final double totalAmount;
   final String status;
   final DateTime createdAt;
@@ -10,7 +9,6 @@ class Sale {
   const Sale({
     required this.id,
     this.customerId,
-    this.userId,
     required this.totalAmount,
     required this.status,
     required this.createdAt,
@@ -21,7 +19,6 @@ class Sale {
     return Sale(
       id: json['id'] as String,
       customerId: json['customer_id'] as String?,
-      userId: json['user_id'] as String?,
       totalAmount: (json['total_amount'] as num).toDouble(),
       status: json['status'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
@@ -31,7 +28,6 @@ class Sale {
   Map<String, dynamic> toJson() {
     return {
       'customer_id': customerId,
-      'user_id': userId,
       'total_amount': totalAmount,
       'status': status,
     };
@@ -40,7 +36,6 @@ class Sale {
   Sale copyWith({
     String? id,
     String? customerId,
-    String? userId,
     double? totalAmount,
     String? status,
     DateTime? createdAt,
@@ -49,7 +44,6 @@ class Sale {
     return Sale(
       id: id ?? this.id,
       customerId: customerId ?? this.customerId,
-      userId: userId ?? this.userId,
       totalAmount: totalAmount ?? this.totalAmount,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,

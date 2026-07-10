@@ -5,7 +5,6 @@ abstract class AbstractSaleRepository {
   Future<Sale> getSale(String id);
   Future<Sale> createSale({
     String? customerId,
-    String? userId,
     required List<SaleItem> items,
   });
   Future<Sale> completeSale(String saleId);
