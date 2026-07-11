@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_error_view.dart';
+import 'package:meow_meow_store/core/widgets/app_loading_view.dart';
 import '../providers/dashboard_provider.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -19,7 +21,7 @@ class DashboardPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Meow Meow Store')),
       body: statsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const AppLoadingView(),
         error: (e, _) => AppErrorView(
           message: e is AppException
               ? e.message
@@ -165,17 +167,17 @@ class _QuickActions extends StatelessWidget {
         _ActionCard(
           title: 'Nueva Venta',
           icon: Icons.add_shopping_cart,
-          onTap: () => Navigator.of(context).pushNamed('/pos'),
+          onTap: () => context.go('/pos'),
         ),
         _ActionCard(
           title: 'Inventario',
           icon: Icons.inventory_2,
-          onTap: () => Navigator.of(context).pushNamed('/inventory'),
+          onTap: () => context.go('/inventory'),
         ),
         _ActionCard(
           title: 'Clientes',
           icon: Icons.people,
-          onTap: () => Navigator.of(context).pushNamed('/customers'),
+          onTap: () => context.go('/customers'),
         ),
       ],
     );
