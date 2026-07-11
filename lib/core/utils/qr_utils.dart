@@ -39,10 +39,7 @@ abstract final class QrUtils {
     return file;
   }
 
-  static Future<void> shareFile(
-    File file, {
-    String? subject,
-  }) async {
+  static Future<void> shareFile(File file, {String? subject}) async {
     await SharePlus.instance.share(
       ShareParams(files: [XFile(file.path)], subject: subject),
     );

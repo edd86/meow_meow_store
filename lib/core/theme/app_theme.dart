@@ -66,8 +66,9 @@ abstract final class AppTheme {
           foregroundColor: colorScheme.onPrimary,
           shape: const StadiumBorder(),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          textStyle:
-              textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary),
+          textStyle: textTheme.labelLarge?.copyWith(
+            color: colorScheme.onPrimary,
+          ),
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -96,9 +97,7 @@ abstract final class AppTheme {
         space: 1,
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(
-          foregroundColor: colorScheme.primary,
-        ),
+        style: TextButton.styleFrom(foregroundColor: colorScheme.primary),
       ),
     );
   }

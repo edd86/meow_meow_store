@@ -44,8 +44,9 @@ final purchaseRepositoryProvider = Provider<AbstractPurchaseRepository>((ref) {
   return PurchaseRepository(client);
 });
 
-final cashRegisterRepositoryProvider =
-    Provider<AbstractCashRegisterRepository>((ref) {
-  final client = ref.watch(supabaseClientProvider);
-  return CashRegisterRepository(client);
-});
+final cashRegisterRepositoryProvider = Provider<AbstractCashRegisterRepository>(
+  (ref) {
+    final client = ref.watch(supabaseClientProvider);
+    return CashRegisterRepository(client);
+  },
+);
