@@ -16,7 +16,7 @@ class Category {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
     );
   }
 

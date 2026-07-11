@@ -31,7 +31,7 @@ class Product {
       buyingPrice: (json['buying_price'] as num).toDouble(),
       sellingPrice: (json['selling_price'] as num).toDouble(),
       stockQuantity: json['stock_quantity'] as int,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
     );
   }
 

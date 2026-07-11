@@ -7,6 +7,7 @@ import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/providers/repository_providers.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_error_view.dart';
+import 'package:meow_meow_store/core/widgets/app_loading_view.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/product_form_dialog.dart';
@@ -69,7 +70,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
           SizedBox(
             height: 50,
             child: categoriesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const AppLoadingView(size: 40),
               error: (e, _) => AppErrorView(
                 message: e is AppException
                     ? e.message
@@ -125,7 +126,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
           const SizedBox(height: AppSpacing.sm),
           Expanded(
             child: productsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const AppLoadingView(),
               error: (e, _) => AppErrorView(
                 message: e is AppException
                     ? e.message
