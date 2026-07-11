@@ -28,7 +28,7 @@ class CashTransaction {
       description: json['description'] as String,
       saleId: json['sale_id'] as String?,
       purchaseId: json['purchase_id'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
     );
   }
 

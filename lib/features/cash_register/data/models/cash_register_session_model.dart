@@ -21,9 +21,9 @@ class CashRegisterSession {
     return CashRegisterSession(
       id: json['id'] as String,
       cashRegisterId: json['cash_register_id'] as String,
-      openedAt: DateTime.parse(json['opened_at'] as String),
+      openedAt: DateTime.parse(json['opened_at'] as String).toLocal(),
       closedAt: json['closed_at'] != null
-          ? DateTime.parse(json['closed_at'] as String)
+          ? DateTime.parse(json['closed_at'] as String).toLocal()
           : null,
       openingAmount: (json['opening_amount'] as num).toDouble(),
       closingAmount: json['closing_amount'] != null

@@ -7,8 +7,10 @@ import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_error_view.dart';
 import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
+import 'package:meow_meow_store/core/widgets/app_loading_view.dart';
 import 'package:meow_meow_store/core/widgets/app_text_field.dart';
 import '../providers/cash_register_provider.dart';
+import '../widgets/transaction_dialog.dart';
 
 class CashRegisterPage extends ConsumerWidget {
   const CashRegisterPage({super.key});
@@ -21,8 +23,12 @@ class CashRegisterPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Caja')),
       body: sessionAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar sesión de caja.'),
+        loading: () => const AppLoadingView(),
+        error: (e, _) => AppErrorView(
+          message: e is AppException
+              ? e.message
+              : 'Error al cargar sesión de caja.',
+        ),
         data: (session) {
           if (session == null) {
             return _ClosedState(onOpen: () => _showOpenDialog(context, ref));
@@ -34,6 +40,12 @@ class CashRegisterPage extends ConsumerWidget {
           );
         },
       ),
+      floatingActionButton: sessionAsync.value != null
+          ? FloatingActionButton(
+              onPressed: () => _showTransactionDialog(context),
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 
@@ -96,6 +108,17 @@ class CashRegisterPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showTransactionDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => const TransactionDialog(),
     );
   }
 }
@@ -184,8 +207,12 @@ class _OpenState extends ConsumerWidget {
         ),
         Expanded(
           child: transactionsAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => AppErrorView(message: e is AppException ? e.message : 'Error al cargar transacciones.'),
+            loading: () => const AppLoadingView(),
+            error: (e, _) => AppErrorView(
+              message: e is AppException
+                  ? e.message
+                  : 'Error al cargar transacciones.',
+            ),
             data: (transactions) {
               if (transactions.isEmpty) {
                 return const Center(

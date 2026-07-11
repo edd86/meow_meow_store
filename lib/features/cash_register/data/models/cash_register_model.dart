@@ -16,7 +16,7 @@ class CashRegister {
       id: json['id'] as String,
       name: json['name'] as String,
       currentBalance: (json['current_balance'] as num).toDouble(),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
+      updatedAt: DateTime.parse(json['updated_at'] as String).toLocal(),
     );
   }
 

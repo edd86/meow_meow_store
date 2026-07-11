@@ -55,6 +55,24 @@ class CashRegisterNotifier
       state = AsyncValue.error(e, st);
     }
   }
+
+  Future<void> addTransaction({
+    required String type,
+    required double amount,
+    required String description,
+  }) async {
+    final currentSession = state.value;
+    if (currentSession == null) {
+      throw Exception('No hay sesion abierta');
+    }
+
+    await _repo.createTransaction(
+      sessionId: currentSession.id,
+      type: type,
+      amount: amount,
+      description: description,
+    );
+  }
 }
 
 final cashRegisterProvider =
