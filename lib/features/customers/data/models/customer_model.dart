@@ -22,7 +22,7 @@ class Customer {
       lastName: json['last_name'] as String?,
       email: json['email'] as String?,
       phone: json['phone'] as String?,
-      createdAt: DateTime.parse(json['created_at'] as String),
+      createdAt: DateTime.parse(json['created_at'] as String).toLocal(),
     );
   }
 

@@ -31,6 +31,28 @@ class CustomerRepository implements AbstractCustomerRepository {
   }
 
   @override
+  Future<List<Customer>> searchCustomers(String query, {int limit = 20}) async {
+    try {
+      if (query.isEmpty) return [];
+
+      final response = await _client
+          .from('customers')
+          .select()
+          .or(
+            'first_name.ilike.%$query%,last_name.ilike.%$query%,email.ilike.%$query%,phone.ilike.%$query%',
+          )
+          .order('first_name')
+          .limit(limit);
+
+      return (response as List)
+          .map((json) => Customer.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
+  }
+
+  @override
   Future<Customer> getCustomer(String id) async {
     try {
       final response = await _client
