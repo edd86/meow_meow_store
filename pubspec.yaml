@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  flutter_native_splash: ^2.4.5
   supabase_flutter: ^2.8.4
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
@@ -21,6 +22,7 @@ dependencies:
   qr_flutter: ^4.1.0
   share_plus: ^13.2.0
   path_provider: ^2.1.6
+  internet_connection_checker_plus: ^3.1.1
 
 dev_dependencies:
   flutter_test:
@@ -30,6 +32,28 @@ dev_dependencies:
   envied_generator: ^1.0.0
   riverpod_generator: ^2.6.3
   json_serializable: ^6.9.4
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/img/
+
+flutter_native_splash:
+  image: assets/img/logo.png
+  color: "#FFFFFF"
+  color_dark: "#FFFFFF"
+  android: true
+  ios: true
+  web: false
+  android_gravity: center
+  ios_content_mode: scaleAspectFit
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/img/logo.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/img/logo.png"
