@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/exceptions/app_exception.dart';
 import '../../../../core/providers/repository_providers.dart';
+import '../../../customers/data/models/customer_model.dart';
 import '../../../inventory/data/models/product_model.dart';
 import '../../../sales/data/models/sale_model.dart';
 import '../../../sales/data/repositories/abstract_sale_repository.dart';
@@ -24,14 +25,24 @@ class CartItem {
 
 class POSState {
   final List<CartItem> items;
+  final Customer? selectedCustomer;
 
-  const POSState({this.items = const []});
+  const POSState({this.items = const [], this.selectedCustomer});
 
   double get totalAmount =>
       items.fold<double>(0, (sum, item) => sum + item.totalPrice);
 
-  POSState copyWith({List<CartItem>? items}) {
-    return POSState(items: items ?? this.items);
+  POSState copyWith({
+    List<CartItem>? items,
+    Customer? selectedCustomer,
+    bool clearCustomer = false,
+  }) {
+    return POSState(
+      items: items ?? this.items,
+      selectedCustomer: clearCustomer
+          ? null
+          : (selectedCustomer ?? this.selectedCustomer),
+    );
   }
 }
 
@@ -87,6 +98,18 @@ class POSNotifier extends StateNotifier<POSState> {
     state = const POSState();
   }
 
+  void setCustomer(Customer? customer) {
+    if (customer == null) {
+      clearCustomer();
+    } else {
+      state = state.copyWith(selectedCustomer: customer);
+    }
+  }
+
+  void clearCustomer() {
+    state = state.copyWith(clearCustomer: true);
+  }
+
   Future<void> completeSale() async {
     try {
       final items = state.items
@@ -102,8 +125,12 @@ class POSNotifier extends StateNotifier<POSState> {
           )
           .toList();
 
-      final sale = await _saleRepo.createSale(items: items);
+      final sale = await _saleRepo.createSale(
+        customerId: state.selectedCustomer?.id,
+        items: items,
+      );
       await _saleRepo.completeSale(sale.id);
+
       clear();
     } catch (e) {
       throw ServerException.fromSupabase(e);
