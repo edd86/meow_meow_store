@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+import 'package:meow_meow_store/core/utils/currency_utils.dart';
 
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
@@ -227,7 +227,7 @@ class _ProductList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
+    final currencyFormat = CurrencyUtils.format;
 
     return ListView.separated(
       padding: AppSpacing.pagePadding,

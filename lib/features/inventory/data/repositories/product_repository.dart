@@ -84,6 +84,21 @@ class ProductRepository implements AbstractProductRepository {
   }
 
   @override
+  Future<Product?> getProductByCodebar(String codebar) async {
+    try {
+      final response = await _client
+          .from('products')
+          .select()
+          .eq('barcode_qr', codebar)
+          .maybeSingle();
+
+      return response != null ? Product.fromJson(response) : null;
+    } catch (e) {
+      throw ServerException.fromSupabase(e);
+    }
+  }
+
+  @override
   Future<List<Product>> searchProducts(String query) async {
     try {
       final response = await _client

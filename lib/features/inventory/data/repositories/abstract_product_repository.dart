@@ -7,4 +7,5 @@ abstract class AbstractProductRepository {
   Future<Product> updateProduct(Product product);
   Future<void> deleteProduct(String id);
   Future<List<Product>> searchProducts(String query);
+  Future<Product?> getProductByCodebar(String codebar);
 }

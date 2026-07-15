@@ -104,7 +104,9 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
             children: [
               Text(
                 widget.product == null ? 'Nuevo Producto' : 'Editar Producto',
-                style: Theme.of(context).textTheme.headlineSmall,
+                style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
@@ -180,7 +182,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                     child: AppTextField(
                       label: 'Precio de compra',
                       controller: _buyingPriceController,
-                      prefixText: '\$',
+                      prefixText: 'Bs',
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) return 'Requerido';
@@ -200,7 +202,7 @@ class _ProductFormDialogState extends ConsumerState<ProductFormDialog> {
                     child: AppTextField(
                       label: 'Precio de venta',
                       controller: _sellingPriceController,
-                      prefixText: '\$',
+                      prefixText: 'Bs',
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) return 'Requerido';
