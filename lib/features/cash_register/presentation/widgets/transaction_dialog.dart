@@ -120,7 +120,7 @@ class _TransactionDialogState extends ConsumerState<TransactionDialog> {
               label: 'Monto',
               controller: _amountController,
               keyboardType: TextInputType.number,
-              prefixText: '\$',
+              prefixText: 'Bs',
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'El monto es requerido';

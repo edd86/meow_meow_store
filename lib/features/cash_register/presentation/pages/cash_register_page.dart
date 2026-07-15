@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:meow_meow_store/core/utils/currency_utils.dart';
+
 import 'package:meow_meow_store/core/exceptions/app_exception.dart';
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
@@ -59,7 +61,7 @@ class CashRegisterPage extends ConsumerWidget {
           label: 'Monto de apertura',
           controller: controller,
           keyboardType: TextInputType.number,
-          prefixText: '\$',
+          prefixText: 'Bs',
         ),
         actions: [
           TextButton(
@@ -89,7 +91,7 @@ class CashRegisterPage extends ConsumerWidget {
           label: 'Monto fisico contado',
           controller: controller,
           keyboardType: TextInputType.number,
-          prefixText: '\$',
+          prefixText: 'Bs',
         ),
         actions: [
           TextButton(
@@ -171,7 +173,7 @@ class _OpenState extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
+    final currencyFormat = CurrencyUtils.format;
 
     return Column(
       children: [
