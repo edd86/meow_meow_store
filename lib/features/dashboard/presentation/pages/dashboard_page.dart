@@ -65,7 +65,7 @@ class _StatsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
+    final currencyFormat = NumberFormat.currency(locale: 'es_BO', symbol: 'Bs');
 
     return GridView.count(
       shrinkWrap: true,
@@ -178,6 +178,16 @@ class _QuickActions extends StatelessWidget {
           title: 'Clientes',
           icon: Icons.people,
           onTap: () => context.go('/customers'),
+        ),
+        _ActionCard(
+          title: 'Reportes',
+          icon: Icons.assessment,
+          onTap: () => context.go('/reports'),
+        ),
+        _ActionCard(
+          title: 'Configuración',
+          icon: Icons.settings,
+          onTap: () => context.go('/settings'),
         ),
       ],
     );
