@@ -48,7 +48,7 @@ class _AppLoadingViewState extends State<AppLoadingView>
               );
             },
             child: Image.asset(
-              'assets/img/logo.png',
+              'assets/img/new_logo.png',
               width: widget.size,
               height: widget.size,
             ),
