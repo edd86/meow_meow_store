@@ -7,5 +7,5 @@ final networkInfoProvider = StreamProvider<InternetStatus>((ref) {
 
 final isOfflineProvider = Provider<bool>((ref) {
   final status = ref.watch(networkInfoProvider);
-  return status.valueOrNull == InternetStatus.disconnected;
+  return status.value == InternetStatus.disconnected;
 });

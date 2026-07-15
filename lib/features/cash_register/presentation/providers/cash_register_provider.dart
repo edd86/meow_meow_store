@@ -4,33 +4,26 @@ import '../../../../core/exceptions/app_exception.dart';
 import '../../../../core/providers/repository_providers.dart';
 import '../../data/models/cash_register_session_model.dart';
 import '../../data/models/cash_transaction_model.dart';
-import '../../data/repositories/abstract_cash_register_repository.dart';
 
-class CashRegisterNotifier
-    extends StateNotifier<AsyncValue<CashRegisterSession?>> {
-  final AbstractCashRegisterRepository _repo;
-
-  CashRegisterNotifier(this._repo) : super(const AsyncValue.loading()) {
-    _loadSession();
-  }
-
-  Future<void> _loadSession() async {
-    state = const AsyncValue.loading();
+class CashRegisterNotifier extends AsyncNotifier<CashRegisterSession?> {
+  @override
+  Future<CashRegisterSession?> build() async {
+    final repo = ref.read(cashRegisterRepositoryProvider);
     try {
-      final session = await _repo.getOpenSession();
-      state = AsyncValue.data(session);
-    } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      return repo.getOpenSession();
+    } catch (_) {
+      return null;
     }
   }
 
   Future<void> openSession(double openingAmount) async {
     state = const AsyncValue.loading();
     try {
-      final register = await _repo.getDefaultCashRegister();
+      final repo = ref.read(cashRegisterRepositoryProvider);
+      final register = await repo.getDefaultCashRegister();
       if (register == null) throw Exception('No cash register found');
 
-      final session = await _repo.openSession(
+      final session = await repo.openSession(
         cashRegisterId: register.id,
         openingAmount: openingAmount,
       );
@@ -46,7 +39,8 @@ class CashRegisterNotifier
 
     state = const AsyncValue.loading();
     try {
-      await _repo.closeSession(
+      final repo = ref.read(cashRegisterRepositoryProvider);
+      await repo.closeSession(
         sessionId: currentSession.id,
         closingAmount: closingAmount,
       );
@@ -66,7 +60,8 @@ class CashRegisterNotifier
       throw Exception('No hay sesion abierta');
     }
 
-    await _repo.createTransaction(
+    final repo = ref.read(cashRegisterRepositoryProvider);
+    await repo.createTransaction(
       sessionId: currentSession.id,
       type: type,
       amount: amount,
@@ -76,13 +71,9 @@ class CashRegisterNotifier
 }
 
 final cashRegisterProvider =
-    StateNotifierProvider<
-      CashRegisterNotifier,
-      AsyncValue<CashRegisterSession?>
-    >((ref) {
-      final repo = ref.watch(cashRegisterRepositoryProvider);
-      return CashRegisterNotifier(repo);
-    });
+    AsyncNotifierProvider<CashRegisterNotifier, CashRegisterSession?>(
+  CashRegisterNotifier.new,
+);
 
 final sessionTransactionsProvider = FutureProvider<List<CashTransaction>>((
   ref,

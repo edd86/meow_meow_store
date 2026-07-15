@@ -5,8 +5,27 @@ import '../../../../core/providers/repository_providers.dart';
 import '../../data/models/product_model.dart';
 import '../../data/models/category_model.dart';
 
-final selectedCategoryProvider = StateProvider<String?>((ref) => null);
-final searchQueryProvider = StateProvider<String?>((ref) => null);
+class SelectedCategoryNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? value) => state = value;
+}
+
+class SearchQueryNotifier extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? value) => state = value;
+}
+
+final selectedCategoryProvider =
+    NotifierProvider<SelectedCategoryNotifier, String?>(
+  SelectedCategoryNotifier.new,
+);
+
+final searchQueryProvider =
+    NotifierProvider<SearchQueryNotifier, String?>(SearchQueryNotifier.new);
 
 final inventoryProductsProvider = FutureProvider<List<Product>>((ref) async {
   final categoryId = ref.watch(selectedCategoryProvider);

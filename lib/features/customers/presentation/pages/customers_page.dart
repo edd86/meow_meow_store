@@ -48,7 +48,7 @@ class _CustomersPageState extends ConsumerState<CustomersPage> {
               label: 'Buscar clientes...',
               controller: _searchController,
               onChanged: (value) {
-                ref.read(customerSearchProvider.notifier).state = value;
+                ref.read(customerSearchProvider.notifier).set(value);
               },
             ),
           ),

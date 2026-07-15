@@ -106,7 +106,7 @@ class SettingsPage extends ConsumerWidget {
                   color: isSelected ? colorScheme.primary : null,
                 ),
                 onTap: () {
-                  ref.read(themeModeProvider.notifier).state = mode;
+                  ref.read(themeModeProvider.notifier).set(mode);
                   Navigator.of(context).pop();
                 },
               );

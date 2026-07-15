@@ -49,7 +49,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
               );
               if (result != null && result.isNotEmpty) {
                 _searchController.text = result;
-                ref.read(searchQueryProvider.notifier).state = result;
+                ref.read(searchQueryProvider.notifier).set(result);
               }
             },
             tooltip: 'Escanear codigo',
@@ -87,8 +87,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                       selected: _selectedCategoryId == null,
                       onSelected: (_) {
                         setState(() => _selectedCategoryId = null);
-                        ref.read(selectedCategoryProvider.notifier).state =
-                            null;
+                        ref.read(selectedCategoryProvider.notifier).set(null);
                       },
                     ),
                   ),
@@ -100,8 +99,7 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
                         selected: _selectedCategoryId == cat.id,
                         onSelected: (_) {
                           setState(() => _selectedCategoryId = cat.id);
-                          ref.read(selectedCategoryProvider.notifier).state =
-                              cat.id;
+                          ref.read(selectedCategoryProvider.notifier).set(cat.id);
                         },
                       ),
                     ),
@@ -117,9 +115,9 @@ class _InventoryPageState extends ConsumerState<InventoryPage> {
               hintText: 'Buscar por nombre o codigo',
               controller: _searchController,
               onChanged: (value) {
-                ref.read(searchQueryProvider.notifier).state = value.isEmpty
-                    ? null
-                    : value;
+                ref.read(searchQueryProvider.notifier).set(
+                      value.isEmpty ? null : value,
+                    );
               },
             ),
           ),

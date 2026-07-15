@@ -5,7 +5,6 @@ import '../../../../core/providers/repository_providers.dart';
 import '../../../customers/data/models/customer_model.dart';
 import '../../../inventory/data/models/product_model.dart';
 import '../../../sales/data/models/sale_model.dart';
-import '../../../sales/data/repositories/abstract_sale_repository.dart';
 
 class CartItem {
   final Product product;
@@ -46,10 +45,9 @@ class POSState {
   }
 }
 
-class POSNotifier extends StateNotifier<POSState> {
-  final AbstractSaleRepository _saleRepo;
-
-  POSNotifier(this._saleRepo) : super(const POSState());
+class POSNotifier extends Notifier<POSState> {
+  @override
+  POSState build() => const POSState();
 
   void addItem(Product product) {
     final existingIndex = state.items.indexWhere(
@@ -112,6 +110,7 @@ class POSNotifier extends StateNotifier<POSState> {
 
   Future<void> completeSale() async {
     try {
+      final saleRepo = ref.read(saleRepositoryProvider);
       final items = state.items
           .map(
             (item) => SaleItem(
@@ -125,11 +124,11 @@ class POSNotifier extends StateNotifier<POSState> {
           )
           .toList();
 
-      final sale = await _saleRepo.createSale(
+      final sale = await saleRepo.createSale(
         customerId: state.selectedCustomer?.id,
         items: items,
       );
-      await _saleRepo.completeSale(sale.id);
+      await saleRepo.completeSale(sale.id);
 
       clear();
     } catch (e) {
@@ -138,12 +137,17 @@ class POSNotifier extends StateNotifier<POSState> {
   }
 }
 
-final posProvider = StateNotifierProvider<POSNotifier, POSState>((ref) {
-  final saleRepo = ref.watch(saleRepositoryProvider);
-  return POSNotifier(saleRepo);
-});
+final posProvider = NotifierProvider<POSNotifier, POSState>(POSNotifier.new);
 
-final posSearchProvider = StateProvider<String>((ref) => '');
+class POSSearchNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void set(String value) => state = value;
+}
+
+final posSearchProvider =
+    NotifierProvider<POSSearchNotifier, String>(POSSearchNotifier.new);
 
 final posProductsProvider = FutureProvider<List<Product>>((ref) async {
   final search = ref.watch(posSearchProvider);

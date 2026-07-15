@@ -79,7 +79,7 @@ class _POSPageState extends ConsumerState<POSPage> {
                     label: 'Buscar productos...',
                     controller: _searchController,
                     onChanged: (value) {
-                      ref.read(posSearchProvider.notifier).state = value;
+                      ref.read(posSearchProvider.notifier).set(value);
                     },
                   ),
                 ),
