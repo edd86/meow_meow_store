@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:meow_meow_store/core/utils/currency_utils.dart';
+
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_elevated_button.dart';
@@ -16,7 +18,7 @@ class CartPanel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final posState = ref.watch(posProvider);
-    final currencyFormat = NumberFormat.currency(locale: 'es_BO', symbol: '\$');
+    final currencyFormat = CurrencyUtils.format;
 
     return Container(
       decoration: BoxDecoration(

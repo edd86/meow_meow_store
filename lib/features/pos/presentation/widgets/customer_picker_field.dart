@@ -9,11 +9,13 @@ import 'package:meow_meow_store/features/customers/data/models/customer_model.da
 class CustomerPickerField extends ConsumerStatefulWidget {
   final Customer? selectedCustomer;
   final ValueChanged<Customer?> onCustomerSelected;
+  final VoidCallback? onCreateNew;
 
   const CustomerPickerField({
     super.key,
     this.selectedCustomer,
     required this.onCustomerSelected,
+    this.onCreateNew,
   });
 
   @override
@@ -162,6 +164,24 @@ class _CustomerPickerFieldState extends ConsumerState<CustomerPickerField> {
                       _clearSearch();
                     },
                   ),
+                  if (widget.onCreateNew != null) ...[
+                    const Divider(height: 1),
+                    ListTile(
+                      dense: true,
+                      leading: Icon(
+                        Icons.person_add,
+                        color: colorScheme.primary,
+                      ),
+                      title: Text(
+                        'Nuevo cliente',
+                        style: TextStyle(color: colorScheme.primary),
+                      ),
+                      onTap: () {
+                        _clearSearch();
+                        widget.onCreateNew!.call();
+                      },
+                    ),
+                  ],
                   if (_results.isNotEmpty) const Divider(height: 1),
                   ..._results.map(
                     (customer) => ListTile(

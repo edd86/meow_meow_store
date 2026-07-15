@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import 'package:meow_meow_store/core/utils/currency_utils.dart';
+
 import 'package:meow_meow_store/core/extensions/context_x.dart';
 import 'package:meow_meow_store/core/theme/app_spacing.dart';
 import 'package:meow_meow_store/core/widgets/app_snackbar.dart';
@@ -15,7 +17,7 @@ class ProductGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currencyFormat = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
+    final currencyFormat = CurrencyUtils.format;
 
     return GridView.builder(
       padding: AppSpacing.pagePadding,
